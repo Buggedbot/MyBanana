@@ -6,18 +6,16 @@
 <title>Peel the Banana</title>
 <style>
   :root {
-    --peel-yellow: #f3d34a;
-    --peel-yellow-dark: #e0b923;
-    --fruit-cream: #f5edcb;
-    --bg-top: #1b2a1c;
-    --bg-bottom: #0c140d;
+    --peel: #ffd23f;
+    --peel-deep: #f0a500;
+    --ink: #0c140d;
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body {
     margin: 0;
     height: 100%;
     overflow: hidden;
-    background: radial-gradient(circle at 50% 20%, var(--bg-top), var(--bg-bottom));
+    background: radial-gradient(circle at 50% 28%, #25371f 0%, #14200f 55%, #0a110b 100%);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     color: #fff;
     touch-action: none;
@@ -32,35 +30,66 @@
     align-items: center;
   }
   header {
+    position: relative;
+    z-index: 10;
     width: 100%;
-    max-width: 480px;
-    padding: 14px 18px 6px;
+    max-width: 520px;
+    padding: 16px 20px 8px;
     display: flex;
     justify-content: space-between;
-    align-items: baseline;
+    align-items: center;
     box-sizing: border-box;
   }
   header h1 {
-    font-size: 1.15rem;
+    font-size: 1.18rem;
     margin: 0;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.4px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.4);
   }
-  header .stats {
-    font-size: 0.95rem;
-    opacity: 0.85;
+  .stats {
     display: flex;
-    gap: 14px;
+    gap: 8px;
   }
+  .pill {
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 5px 11px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.07);
+    backdrop-filter: blur(4px);
+    white-space: nowrap;
+    transition: transform 0.18s ease, background 0.18s ease;
+  }
+  .pill.bump { transform: scale(1.18); background: rgba(255,210,63,0.22); }
   #stage-wrap {
     position: relative;
     flex: 1;
     width: 100%;
-    max-width: 480px;
+    max-width: 520px;
     display: flex;
     align-items: center;
     justify-content: center;
   }
+  /* soft glow behind the banana */
+  #stage-wrap::before {
+    content: "";
+    position: absolute;
+    width: 62%;
+    height: 56%;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,213,80,0.20), rgba(255,213,80,0) 70%);
+    filter: blur(8px);
+    pointer-events: none;
+    animation: breathe 5s ease-in-out infinite;
+  }
+  @keyframes breathe {
+    0%, 100% { opacity: 0.7; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.06); }
+  }
   #stage {
+    position: relative;
+    z-index: 1;
     touch-action: none;
     display: block;
     width: 100%;
@@ -68,84 +97,72 @@
   }
   #progress-bar {
     position: absolute;
-    bottom: 14px;
-    left: 18px;
-    right: 18px;
-    height: 10px;
-    border-radius: 6px;
-    background: rgba(255,255,255,0.12);
+    z-index: 6;
+    bottom: 16px;
+    left: 22px;
+    right: 22px;
+    height: 12px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.10);
     overflow: hidden;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.3);
   }
   #progress-fill {
     height: 100%;
     width: 0%;
-    background: linear-gradient(90deg, #ffd23f, #ff8a3d);
-    transition: width 0.12s ease-out;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #ffe25a, #ff9a3d);
+    box-shadow: 0 0 12px rgba(255,180,60,0.6);
+    transition: width 0.18s cubic-bezier(.2,.8,.2,1);
   }
-  #overlay {
+  #toast {
     position: absolute;
-    inset: 0;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0,0,0,0.55);
-    backdrop-filter: blur(2px);
-    z-index: 20;
-  }
-  #overlay.show { display: flex; }
-  .card {
-    background: #1f2e20;
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 18px;
-    padding: 28px 26px;
-    max-width: 320px;
-    text-align: center;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.5);
-  }
-  .card h2 {
-    margin: 0 0 6px;
-    font-size: 1.4rem;
-  }
-  .card p {
-    opacity: 0.8;
-    margin: 0 0 18px;
-    font-size: 0.92rem;
-    line-height: 1.4;
-  }
-  .card .big-stat {
-    font-size: 2.4rem;
+    z-index: 12;
+    top: 38%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.6);
+    padding: 12px 22px;
+    border-radius: 16px;
+    background: rgba(20,30,16,0.85);
+    border: 1px solid rgba(255,210,63,0.35);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.45);
     font-weight: 700;
-    margin: 4px 0 2px;
-    color: var(--peel-yellow);
-  }
-  button {
-    background: linear-gradient(135deg, #ffd23f, #ffb627);
-    color: #2a2206;
-    font-weight: 700;
-    font-size: 1rem;
-    border: none;
-    padding: 12px 26px;
-    border-radius: 999px;
-    cursor: pointer;
-    box-shadow: 0 6px 16px rgba(255, 178, 39, 0.35);
-  }
-  button:active { transform: scale(0.97); }
-  footer {
-    padding: 8px 0 16px;
-    font-size: 0.78rem;
-    opacity: 0.5;
+    font-size: 1.15rem;
+    color: var(--peel);
+    opacity: 0;
+    pointer-events: none;
     text-align: center;
+    white-space: nowrap;
+  }
+  #toast.show {
+    animation: pop 1.3s cubic-bezier(.2,.9,.3,1) forwards;
+  }
+  @keyframes pop {
+    0%   { opacity: 0; transform: translate(-50%,-50%) scale(0.6); }
+    18%  { opacity: 1; transform: translate(-50%,-58%) scale(1.08); }
+    30%  { transform: translate(-50%,-58%) scale(1); }
+    78%  { opacity: 1; transform: translate(-50%,-60%) scale(1); }
+    100% { opacity: 0; transform: translate(-50%,-74%) scale(0.96); }
   }
   #hint {
     position: absolute;
-    top: 8px;
+    z-index: 6;
+    top: 6px;
     left: 0;
     right: 0;
     text-align: center;
     font-size: 0.85rem;
     opacity: 0.7;
     pointer-events: none;
-    z-index: 5;
+    transition: opacity 0.6s ease;
+  }
+  footer {
+    position: relative;
+    z-index: 10;
+    padding: 8px 0 16px;
+    font-size: 0.76rem;
+    opacity: 0.5;
+    text-align: center;
   }
 </style>
 </head>
@@ -154,24 +171,18 @@
   <header>
     <h1>🍌 Peel the Banana</h1>
     <div class="stats">
-      <span id="timer">0.0s</span>
-      <span id="best">Best: --</span>
+      <span class="pill" id="timer">0.0s</span>
+      <span class="pill" id="count">🍌 0</span>
+      <span class="pill" id="best">⚡ --</span>
     </div>
   </header>
   <div id="stage-wrap">
     <div id="hint">Drag a peel to open it · drag the background to spin</div>
     <canvas id="stage"></canvas>
+    <div id="toast"></div>
     <div id="progress-bar"><div id="progress-fill"></div></div>
-    <div id="overlay">
-      <div class="card" id="card">
-        <h2 id="card-title">Banana Peeled!</h2>
-        <div class="big-stat" id="card-time">0.0s</div>
-        <p id="card-sub">Nice and clean. Ready for another?</p>
-        <button id="restart-btn">Peel Another</button>
-      </div>
-    </div>
   </div>
-  <footer>Tip: peel all 4 strips before time runs out</footer>
+  <footer>Peel all 4 strips — a fresh banana appears each time</footer>
 </div>
 <script src="vendor/three.min.js"></script>
 <script>
@@ -181,40 +192,28 @@
   var canvas = document.getElementById("stage");
   var stageWrap = document.getElementById("stage-wrap");
   var timerEl = document.getElementById("timer");
+  var countEl = document.getElementById("count");
   var bestEl = document.getElementById("best");
   var progressFill = document.getElementById("progress-fill");
-  var overlay = document.getElementById("overlay");
-  var cardTitle = document.getElementById("card-title");
-  var cardTime = document.getElementById("card-time");
-  var cardSub = document.getElementById("card-sub");
-  var restartBtn = document.getElementById("restart-btn");
+  var toastEl = document.getElementById("toast");
   var hint = document.getElementById("hint");
 
-  var TIME_LIMIT = 20; // seconds
   var STRIP_COUNT = 4;
   var LENGTH = 3.6;
-  var BASE_R = 0.62;
+  var BASE_R = 0.6;
   var BOW = 0.5;
   var GAP_RAD = (4 * Math.PI) / 180;
-  var PEEL_ANGLE_MAX = (195 * Math.PI) / 180;
-  var PEEL_RANGE_PX = 150; // total drag distance (px) for a full peel
+  var PEEL_ANGLE_MAX = (205 * Math.PI) / 180;
+  var PEEL_RANGE_PX = 150;     // drag distance (px) for a full peel
   var ROTATE_SPEED = 0.0065;
+  var PEEL_EASE = 9;           // how snappily strips chase the drag target
+  var AUTO_SPIN = 0.18;        // idle rotation (rad/s)
+  var BOB_AMP = 0.06;
+  var ENTER_DUR = 0.62;
+  var EXIT_DUR = 0.5;
+  var BASE_Y = 0;
 
-  var strips = [];
-  var drag = null;
-  var startTime = 0;
-  var elapsed = 0;
-  var finished = false;
-  var rafId = null;
-
-  var best = null;
-  try {
-    var saved = localStorage.getItem("banana_best_time");
-    if (saved) best = parseFloat(saved);
-  } catch (e) {}
-  updateBestLabel();
-
-  // ---- banana curve: t=0 is the root/stem at the bottom, t=1 is the tip at the top ----
+  // ---- banana curve: t=0 is the root/stem (bottom), t=1 is the tip (top) ----
   function centerline(t) {
     return new THREE.Vector3(BOW * Math.sin(Math.PI * t), (t - 0.5) * LENGTH, 0);
   }
@@ -226,7 +225,6 @@
     var t0 = Math.max(0, t - e), t1 = Math.min(1, t + e);
     return centerline(t1).sub(centerline(t0)).normalize();
   }
-  // cross-section frame: N bows with the curve (in-plane), B gives roundness (out-of-plane)
   function frameAt(t) {
     var T = tangentAt(t);
     var N = new THREE.Vector3(-T.y, T.x, 0).normalize();
@@ -234,16 +232,13 @@
     return { T: T, N: N, B: B };
   }
 
-  // builds a tube mesh geometry spanning theta [thetaStart, thetaEnd] over t in [0,1]
   function buildTubeGeometry(thetaStart, thetaEnd, radialSegs, samples, radiusScale) {
-    var positions = [];
-    var indices = [];
-    var colsCount = radialSegs + 1;
+    var positions = [], indices = [];
+    var cols = radialSegs + 1;
     var i, j;
     for (i = 0; i <= samples; i++) {
       var t = i / samples;
-      var c = centerline(t);
-      var f = frameAt(t);
+      var c = centerline(t), f = frameAt(t);
       var r = radiusAt(t) * radiusScale;
       for (j = 0; j <= radialSegs; j++) {
         var theta = thetaStart + (thetaEnd - thetaStart) * (j / radialSegs);
@@ -257,12 +252,8 @@
     }
     for (i = 0; i < samples; i++) {
       for (j = 0; j < radialSegs; j++) {
-        var a = i * colsCount + j;
-        var b = a + 1;
-        var c2 = a + colsCount;
-        var d = c2 + 1;
-        indices.push(a, c2, b);
-        indices.push(b, c2, d);
+        var a = i * cols + j, b = a + 1, cc = a + cols, d = cc + 1;
+        indices.push(a, cc, b, b, cc, d);
       }
     }
     var geo = new THREE.BufferGeometry();
@@ -272,143 +263,206 @@
     return geo;
   }
 
-  // ---- scene setup ----
+  // ---- renderer / scene ----
   var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  if (THREE.SRGBColorSpace) renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.08;
 
   var scene = new THREE.Scene();
   var camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
-  camera.position.set(0, 0.15, 7);
+  camera.position.set(0, 0.1, 7.6);
   camera.lookAt(0, 0, 0);
 
-  scene.add(new THREE.HemisphereLight(0xfff4d6, 0x14210f, 0.95));
+  scene.add(new THREE.HemisphereLight(0xfff6e0, 0x1d2c14, 0.9));
   var keyLight = new THREE.DirectionalLight(0xffffff, 1.15);
-  keyLight.position.set(2.4, 3, 4);
+  keyLight.position.set(3, 4, 5);
   scene.add(keyLight);
-  var fillLight = new THREE.DirectionalLight(0xffe9b0, 0.35);
+  var fillLight = new THREE.DirectionalLight(0xffe2a8, 0.35);
   fillLight.position.set(-3, -1, -2);
   scene.add(fillLight);
+  var rimLight = new THREE.DirectionalLight(0xbfe0ff, 0.5);
+  rimLight.position.set(-1, 2, -4);
+  scene.add(rimLight);
 
-  var bananaGroup = new THREE.Group();
-  bananaGroup.rotation.set(0, 0.6, 0.15);
-  scene.add(bananaGroup);
+  // ---- banana factory: each banana owns its own meshes + materials ----
+  function createBanana() {
+    var group = new THREE.Group();
+    group.rotation.set(0, 0.6, 0.12);
 
-  var coreMaterial = new THREE.MeshStandardMaterial({
-    color: 0xf5edcb, roughness: 0.45, metalness: 0.04, side: THREE.DoubleSide
-  });
-  var stemMaterial = new THREE.MeshStandardMaterial({ color: 0x6b5b2a, roughness: 0.7 });
-  var tipMaterial = new THREE.MeshStandardMaterial({ color: 0x5b4a1e, roughness: 0.7 });
+    var mats = [];
+    function mat(opts) { var m = new THREE.MeshStandardMaterial(opts); mats.push(m); return m; }
 
-  function buildScene() {
-    var coreGeo = buildTubeGeometry(0, Math.PI * 2, 36, 26, 0.84);
-    var coreMesh = new THREE.Mesh(coreGeo, coreMaterial);
-    bananaGroup.add(coreMesh);
+    var coreMat = mat({ color: 0xf7eec9, roughness: 0.5, metalness: 0.04, side: THREE.DoubleSide });
+    var stemMat = mat({ color: 0x6b5b2a, roughness: 0.7 });
+    var tipMat = mat({ color: 0x55471d, roughness: 0.7 });
 
-    var root = centerline(0);
-    var tip = centerline(1);
-    var rootFrame = frameAt(0);
+    group.add(new THREE.Mesh(buildTubeGeometry(0, Math.PI * 2, 36, 26, 0.84), coreMat));
 
-    var stemGeo = new THREE.ConeGeometry(0.16, 0.36, 12);
-    var stemMesh = new THREE.Mesh(stemGeo, stemMaterial);
-    var negT0 = rootFrame.T.clone().negate();
-    stemMesh.position.copy(root).addScaledVector(negT0, 0.16);
-    stemMesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), negT0);
-    bananaGroup.add(stemMesh);
+    var root = centerline(0), tip = centerline(1), rf = frameAt(0);
+    var negT0 = rf.T.clone().negate();
 
-    var tipMesh = new THREE.Mesh(new THREE.SphereGeometry(0.1, 12, 10), tipMaterial);
+    var stem = new THREE.Mesh(new THREE.ConeGeometry(0.16, 0.36, 12), stemMat);
+    stem.position.copy(root).addScaledVector(negT0, 0.16);
+    stem.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), negT0);
+    group.add(stem);
+
+    var tipMesh = new THREE.Mesh(new THREE.SphereGeometry(0.1, 12, 10), tipMat);
     tipMesh.position.copy(tip);
-    bananaGroup.add(tipMesh);
+    group.add(tipMesh);
 
-    strips = [];
+    var strips = [];
     for (var i = 0; i < STRIP_COUNT; i++) {
       var thetaStart = -Math.PI + i * (Math.PI / 2);
       var thetaEnd = thetaStart + Math.PI / 2;
       var thetaC = (thetaStart + thetaEnd) / 2;
 
-      var geo = buildTubeGeometry(
-        thetaStart + GAP_RAD / 2, thetaEnd - GAP_RAD / 2, 12, 26, 1.0
-      );
+      var geo = buildTubeGeometry(thetaStart + GAP_RAD / 2, thetaEnd - GAP_RAD / 2, 12, 26, 1.0);
       geo.translate(-root.x, -root.y, -root.z);
 
       var isOuter = i === 0 || i === STRIP_COUNT - 1;
-      var material = new THREE.MeshStandardMaterial({
-        color: isOuter ? 0xf3ce4c : 0xfff2ab,
-        roughness: 0.55,
-        metalness: 0.05,
+      var stripMat = mat({
+        color: isOuter ? 0xf3c63c : 0xffd84e,
+        roughness: 0.52, metalness: 0.05,
+        emissive: 0x3a2c00, emissiveIntensity: 0.18,
         side: THREE.DoubleSide
       });
-      var mesh = new THREE.Mesh(geo, material);
+      var mesh = new THREE.Mesh(geo, stripMat);
 
       var hinge = new THREE.Object3D();
       hinge.position.copy(root);
       hinge.add(mesh);
-      bananaGroup.add(hinge);
+      group.add(hinge);
 
-      var radial = rootFrame.N.clone().multiplyScalar(Math.cos(thetaC))
-        .addScaledVector(rootFrame.B, Math.sin(thetaC));
-      var axis = rootFrame.T.clone().cross(radial).normalize();
+      var radial = rf.N.clone().multiplyScalar(Math.cos(thetaC)).addScaledVector(rf.B, Math.sin(thetaC));
+      var axis = rf.T.clone().cross(radial).normalize();
 
       strips.push({
-        index: i,
-        mesh: mesh,
-        hinge: hinge,
-        axis: axis,
-        peelAmount: 0,
-        peeled: false,
-        angleMax: PEEL_ANGLE_MAX
+        mesh: mesh, hinge: hinge, axis: axis,
+        peel: 0, peelTarget: 0, peeled: false, angleMax: PEEL_ANGLE_MAX
       });
     }
+
+    mats.forEach(function (m) { m.transparent = true; });
+
+    return {
+      group: group, strips: strips, done: false,
+      setOpacity: function (o) { mats.forEach(function (m) { m.opacity = o; }); },
+      setScale: function (s) { group.scale.setScalar(s); },
+      dispose: function () {
+        group.traverse(function (o) { if (o.geometry) o.geometry.dispose(); });
+        mats.forEach(function (m) { m.dispose(); });
+        scene.remove(group);
+      }
+    };
   }
 
-  buildScene();
+  // ---- particle burst on completion ----
+  var PCOUNT = 44;
+  var pPos = new Float32Array(PCOUNT * 3);
+  var pGeo = new THREE.BufferGeometry();
+  pGeo.setAttribute("position", new THREE.BufferAttribute(pPos, 3));
+  var pMat = new THREE.PointsMaterial({
+    color: 0xffd23f, size: 0.16, transparent: true, opacity: 0, depthWrite: false
+  });
+  var points = new THREE.Points(pGeo, pMat);
+  points.visible = false;
+  scene.add(points);
+  var pVel = [];
+  var pLife = 0;
+  var P_LIFE = 1.1;
+  for (var pi = 0; pi < PCOUNT; pi++) pVel.push(new THREE.Vector3());
 
-  // ---- interaction: drag a strip to peel it, drag elsewhere to spin the banana ----
+  function burst(center) {
+    for (var i = 0; i < PCOUNT; i++) {
+      pPos[i * 3] = center.x;
+      pPos[i * 3 + 1] = center.y;
+      pPos[i * 3 + 2] = center.z;
+      var dir = new THREE.Vector3(Math.random() - 0.5, Math.random() * 0.9 + 0.1, Math.random() - 0.5).normalize();
+      pVel[i].copy(dir).multiplyScalar(1.6 + Math.random() * 1.8);
+    }
+    pLife = P_LIFE;
+    points.visible = true;
+    pMat.opacity = 1;
+    pGeo.attributes.position.needsUpdate = true;
+  }
+
+  function updateParticles(dt) {
+    if (pLife <= 0) return;
+    pLife -= dt;
+    for (var i = 0; i < PCOUNT; i++) {
+      pVel[i].y -= 4.2 * dt;
+      pPos[i * 3] += pVel[i].x * dt;
+      pPos[i * 3 + 1] += pVel[i].y * dt;
+      pPos[i * 3 + 2] += pVel[i].z * dt;
+    }
+    pMat.opacity = Math.max(0, pLife / P_LIFE);
+    pGeo.attributes.position.needsUpdate = true;
+    if (pLife <= 0) points.visible = false;
+  }
+
+  // ---- game state ----
+  var current = createBanana();
+  current.setScale(0);
+  scene.add(current.group);
+
+  var state = "entering";   // entering | playing | exiting
+  var stateT = 0;
+  var started = false;      // has the player touched the current banana yet
+  var bananaStart = 0;
+  var bananaElapsed = 0;
+  var peeledCount = 0;
+  var drag = null;
+
+  var best = null;
+  try {
+    var saved = localStorage.getItem("banana_best_time");
+    if (saved) best = parseFloat(saved);
+  } catch (e) {}
+  updateBest();
+  updateCount();
+
+  // ---- easing ----
+  function easeOutBack(x) {
+    var c1 = 1.70158, c3 = c1 + 1;
+    return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2);
+  }
+  function easeOutCubic(x) { return 1 - Math.pow(1 - x, 3); }
+  function easeInCubic(x) { return x * x * x; }
+  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+  // ---- interaction ----
   var raycaster = new THREE.Raycaster();
 
   function pointerInfo(evt) {
     var rect = canvas.getBoundingClientRect();
-    var clientX, clientY;
-    if (evt.touches && evt.touches.length) {
-      clientX = evt.touches[0].clientX;
-      clientY = evt.touches[0].clientY;
-    } else if (evt.changedTouches && evt.changedTouches.length) {
-      clientX = evt.changedTouches[0].clientX;
-      clientY = evt.changedTouches[0].clientY;
-    } else {
-      clientX = evt.clientX;
-      clientY = evt.clientY;
-    }
+    var cx, cy;
+    if (evt.touches && evt.touches.length) { cx = evt.touches[0].clientX; cy = evt.touches[0].clientY; }
+    else if (evt.changedTouches && evt.changedTouches.length) { cx = evt.changedTouches[0].clientX; cy = evt.changedTouches[0].clientY; }
+    else { cx = evt.clientX; cy = evt.clientY; }
     return {
-      ndcX: ((clientX - rect.left) / rect.width) * 2 - 1,
-      ndcY: -(((clientY - rect.top) / rect.height) * 2 - 1),
-      px: clientX,
-      py: clientY
+      ndcX: ((cx - rect.left) / rect.width) * 2 - 1,
+      ndcY: -(((cy - rect.top) / rect.height) * 2 - 1),
+      px: cx, py: cy
     };
   }
 
-  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
-
   function onPointerDown(evt) {
-    if (finished) return;
+    if (state !== "playing") return;
     var p = pointerInfo(evt);
     raycaster.setFromCamera({ x: p.ndcX, y: p.ndcY }, camera);
     var targets = [];
-    for (var i = 0; i < strips.length; i++) {
-      if (!strips[i].peeled) targets.push(strips[i].mesh);
-    }
+    current.strips.forEach(function (s) { if (!s.peeled) targets.push(s.mesh); });
     var hits = raycaster.intersectObjects(targets, false);
     if (hits.length) {
-      var hitMesh = hits[0].object;
       var strip = null;
-      for (var j = 0; j < strips.length; j++) {
-        if (strips[j].mesh === hitMesh) { strip = strips[j]; break; }
+      for (var j = 0; j < current.strips.length; j++) {
+        if (current.strips[j].mesh === hits[0].object) { strip = current.strips[j]; break; }
       }
       drag = { mode: "peel", strip: strip, startX: p.px, startY: p.py, lastDist: 0 };
       hint.style.opacity = "0";
-      if (!startTime) {
-        startTime = performance.now();
-        loop();
-      }
+      if (!started) { started = true; bananaStart = performance.now(); }
     } else {
       drag = { mode: "rotate", lastX: p.px, lastY: p.py };
     }
@@ -416,7 +470,7 @@
   }
 
   function onPointerMove(evt) {
-    if (!drag || finished) return;
+    if (!drag || state !== "playing") return;
     var p = pointerInfo(evt);
     if (drag.mode === "peel") {
       var dx = p.px - drag.startX, dy = p.py - drag.startY;
@@ -425,19 +479,14 @@
       drag.lastDist = dist;
       if (delta > 0) {
         var s = drag.strip;
-        s.peelAmount = Math.min(1, s.peelAmount + delta / PEEL_RANGE_PX);
-        s.hinge.quaternion.setFromAxisAngle(s.axis, s.peelAmount * s.angleMax);
-        if (s.peelAmount >= 1 && !s.peeled) {
-          s.peeled = true;
-          checkComplete();
-        }
+        s.peelTarget = Math.min(1, s.peelTarget + delta / PEEL_RANGE_PX);
+        if (s.peelTarget >= 1 && !s.peeled) { s.peeled = true; checkComplete(); }
       }
     } else {
       var ddx = p.px - drag.lastX, ddy = p.py - drag.lastY;
-      bananaGroup.rotation.y += ddx * ROTATE_SPEED;
-      bananaGroup.rotation.x = clamp(bananaGroup.rotation.x + ddy * ROTATE_SPEED, -1.1, 1.1);
-      drag.lastX = p.px;
-      drag.lastY = p.py;
+      current.group.rotation.y += ddx * ROTATE_SPEED;
+      current.group.rotation.x = clamp(current.group.rotation.x + ddy * ROTATE_SPEED, -1.1, 1.1);
+      drag.lastX = p.px; drag.lastY = p.py;
     }
     evt.preventDefault();
   }
@@ -445,74 +494,59 @@
   function onPointerUp() { drag = null; }
 
   function checkComplete() {
-    var allDone = strips.every(function (s) { return s.peeled; });
-    if (allDone && !finished) {
-      finished = true;
-      var finalTime = elapsed;
-      setTimeout(function () { showResult(finalTime, true); }, 220);
-    }
-  }
-
-  function loop() {
-    if (finished) return;
-    elapsed = (performance.now() - startTime) / 1000;
-    if (elapsed >= TIME_LIMIT) {
-      finished = true;
-      showResult(TIME_LIMIT, false);
-      return;
-    }
-    timerEl.textContent = elapsed.toFixed(1) + "s";
-    var totalProgress = strips.reduce(function (sum, s) { return sum + s.peelAmount; }, 0) / STRIP_COUNT;
-    progressFill.style.width = (totalProgress * 100).toFixed(1) + "%";
-    rafId = requestAnimationFrame(loop);
-  }
-
-  function showResult(time, success) {
-    cancelAnimationFrame(rafId);
-    timerEl.textContent = time.toFixed(1) + "s";
-    if (success) {
-      cardTitle.textContent = "Banana Peeled!";
-      cardTime.textContent = time.toFixed(1) + "s";
-      if (best === null || time < best) {
-        best = time;
+    if (current.done) return;
+    if (current.strips.every(function (s) { return s.peeled; })) {
+      current.done = true;
+      drag = null;
+      peeledCount++;
+      bananaElapsed = (performance.now() - bananaStart) / 1000;
+      updateCount();
+      bump(countEl);
+      var msg;
+      if (started && (best === null || bananaElapsed < best)) {
+        best = bananaElapsed;
         try { localStorage.setItem("banana_best_time", String(best)); } catch (e) {}
-        cardSub.textContent = "New best time!";
+        updateBest();
+        bump(bestEl);
+        msg = "New best! " + bananaElapsed.toFixed(1) + "s ⚡";
       } else {
-        cardSub.textContent = "Nice and clean. Ready for another?";
+        msg = "Peeled! " + bananaElapsed.toFixed(1) + "s ✨";
       }
-    } else {
-      cardTitle.textContent = "Time's Up!";
-      cardTime.textContent = Math.round(
-        (strips.reduce(function (s, st) { return s + st.peelAmount; }, 0) / STRIP_COUNT) * 100
-      ) + "%";
-      cardSub.textContent = "That's how much you peeled. Try again?";
+      showToast(msg);
+      burst(current.group.localToWorld(new THREE.Vector3(0, 0, 0)));
+      // let the strips finish swinging, then drop the banana away
+      setTimeout(function () { if (state === "playing") { state = "exiting"; stateT = 0; } }, 360);
     }
-    updateBestLabel();
-    overlay.classList.add("show");
   }
 
-  function updateBestLabel() {
-    bestEl.textContent = "Best: " + (best !== null ? best.toFixed(1) + "s" : "--");
-  }
-
-  function resetGame() {
-    finished = false;
-    drag = null;
-    startTime = 0;
-    elapsed = 0;
+  function spawnNext() {
+    current.dispose();
+    current = createBanana();
+    current.setScale(0);
+    scene.add(current.group);
+    state = "entering";
+    stateT = 0;
+    started = false;
+    bananaElapsed = 0;
     timerEl.textContent = "0.0s";
     progressFill.style.width = "0%";
-    overlay.classList.remove("show");
-    hint.style.opacity = "0.7";
-    bananaGroup.rotation.set(0, 0.6, 0.15);
-    strips.forEach(function (s) {
-      s.peelAmount = 0;
-      s.peeled = false;
-      s.hinge.quaternion.identity();
-    });
   }
 
-  restartBtn.addEventListener("click", resetGame);
+  // ---- UI helpers ----
+  function showToast(text) {
+    toastEl.textContent = text;
+    toastEl.classList.remove("show");
+    void toastEl.offsetWidth; // restart animation
+    toastEl.classList.add("show");
+  }
+  function bump(el) {
+    el.classList.remove("bump");
+    void el.offsetWidth;
+    el.classList.add("bump");
+    setTimeout(function () { el.classList.remove("bump"); }, 220);
+  }
+  function updateBest() { bestEl.textContent = "⚡ " + (best !== null ? best.toFixed(1) + "s" : "--"); }
+  function updateCount() { countEl.textContent = "🍌 " + peeledCount; }
 
   // ---- input wiring ----
   canvas.addEventListener("mousedown", onPointerDown);
@@ -525,8 +559,7 @@
 
   function resize() {
     var rect = stageWrap.getBoundingClientRect();
-    var w = Math.max(280, rect.width);
-    var h = Math.max(360, rect.height);
+    var w = Math.max(280, rect.width), h = Math.max(360, rect.height);
     renderer.setSize(w, h);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
@@ -534,12 +567,58 @@
   window.addEventListener("resize", resize);
   resize();
 
-  // ---- render loop: always running so the user can spin the banana anytime ----
-  function renderLoop() {
+  // ---- main loop ----
+  var prev = performance.now();
+  function frame(now) {
+    var dt = Math.min(0.05, (now - prev) / 1000);
+    prev = now;
+    update(dt, now);
     renderer.render(scene, camera);
-    requestAnimationFrame(renderLoop);
+    requestAnimationFrame(frame);
   }
-  renderLoop();
+
+  function update(dt, now) {
+    var g = current.group;
+
+    // smooth peel: each strip eases toward its drag target
+    var k = 1 - Math.exp(-PEEL_EASE * dt);
+    var sumTarget = 0;
+    current.strips.forEach(function (s) {
+      s.peel += (s.peelTarget - s.peel) * k;
+      s.hinge.quaternion.setFromAxisAngle(s.axis, s.peel * s.angleMax);
+      sumTarget += s.peelTarget;
+    });
+
+    if (state === "playing") {
+      if (!drag) g.rotation.y += AUTO_SPIN * dt;           // gentle idle spin
+      g.position.y = BASE_Y + Math.sin(now * 0.0018) * BOB_AMP;
+      g.position.x = 0;
+      if (started) {
+        bananaElapsed = (now - bananaStart) / 1000;
+        timerEl.textContent = bananaElapsed.toFixed(1) + "s";
+      }
+      progressFill.style.width = (sumTarget / STRIP_COUNT * 100).toFixed(1) + "%";
+    } else if (state === "entering") {
+      stateT = Math.min(1, stateT + dt / ENTER_DUR);
+      current.setScale(easeOutBack(stateT));
+      current.setOpacity(Math.min(1, stateT * 1.6));
+      g.position.y = BASE_Y + (1 - easeOutCubic(stateT)) * 3.2;
+      g.rotation.y += AUTO_SPIN * dt;
+      if (stateT >= 1) { current.setScale(1); current.setOpacity(1); state = "playing"; }
+    } else if (state === "exiting") {
+      stateT = Math.min(1, stateT + dt / EXIT_DUR);
+      var e = easeInCubic(stateT);
+      current.setScale(1 - 0.25 * e);
+      current.setOpacity(1 - e);
+      g.position.y = BASE_Y - e * 5;
+      g.rotation.y += (AUTO_SPIN + 0.6) * dt;
+      if (stateT >= 1) spawnNext();
+    }
+
+    updateParticles(dt);
+  }
+
+  requestAnimationFrame(frame);
 })();
 </script>
 </body>
