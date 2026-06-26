@@ -15,7 +15,7 @@
     margin: 0;
     height: 100%;
     overflow: hidden;
-    background: radial-gradient(circle at 50% 28%, #25371f 0%, #14200f 55%, #0a110b 100%);
+    background: radial-gradient(circle at 50% 28%, #2c2620 0%, #1a1612 55%, #0a0807 100%);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     color: #fff;
     touch-action: none;
@@ -113,7 +113,7 @@
     border-radius: 8px;
     background: linear-gradient(90deg, #ffe25a, #ff9a3d);
     box-shadow: 0 0 12px rgba(255,180,60,0.6);
-    transition: width 0.18s cubic-bezier(.2,.8,.2,1);
+    transition: width 0.28s cubic-bezier(.2,.8,.2,1);
   }
   #toast {
     position: absolute;
@@ -123,7 +123,7 @@
     transform: translate(-50%, -50%) scale(0.6);
     padding: 12px 22px;
     border-radius: 16px;
-    background: rgba(20,30,16,0.85);
+    background: rgba(26,20,14,0.88);
     border: 1px solid rgba(255,210,63,0.35);
     box-shadow: 0 10px 30px rgba(0,0,0,0.45);
     font-weight: 700;
@@ -263,6 +263,73 @@
     return geo;
   }
 
+  // closed outer+inner shell with end/side walls, so peel strips read as solid rather than paper-thin
+  function buildSlabGeometry(thetaStart, thetaEnd, radialSegs, samples, outerScale, innerScale) {
+    var positions = [], indices = [];
+    var cols = radialSegs + 1;
+    var i, j;
+
+    function ring(radiusScale) {
+      for (i = 0; i <= samples; i++) {
+        var t = i / samples;
+        var c = centerline(t), f = frameAt(t);
+        var r = radiusAt(t) * radiusScale;
+        for (j = 0; j <= radialSegs; j++) {
+          var theta = thetaStart + (thetaEnd - thetaStart) * (j / radialSegs);
+          var ct = Math.cos(theta), st = Math.sin(theta);
+          positions.push(
+            c.x + f.N.x * r * ct + f.B.x * r * st,
+            c.y + f.N.y * r * ct + f.B.y * r * st,
+            c.z + f.N.z * r * ct + f.B.z * r * st
+          );
+        }
+      }
+    }
+    function quad(a, b, cc, d) { indices.push(a, cc, b, b, cc, d); }
+
+    ring(outerScale); // outer surface: vertex block 0
+    ring(innerScale);  // inner surface: vertex block 1
+    var outerBase = 0, innerBase = (samples + 1) * cols;
+
+    // outer surface (facing out)
+    for (i = 0; i < samples; i++) {
+      for (j = 0; j < radialSegs; j++) {
+        var a = outerBase + i * cols + j, b = a + 1, c2 = a + cols, d2 = c2 + 1;
+        quad(a, b, c2, d2);
+      }
+    }
+    // inner surface (facing in, so reverse winding)
+    for (i = 0; i < samples; i++) {
+      for (j = 0; j < radialSegs; j++) {
+        var ai = innerBase + i * cols + j, bi = ai + 1, ci = ai + cols, di = ci + 1;
+        quad(bi, ai, di, ci);
+      }
+    }
+    // side walls along the strip's length, at theta = thetaStart and theta = thetaEnd
+    for (i = 0; i < samples; i++) {
+      var oA = outerBase + i * cols, oB = outerBase + (i + 1) * cols;
+      var iA = innerBase + i * cols, iB = innerBase + (i + 1) * cols;
+      quad(oA, iA, oB, iB); // thetaStart edge
+      var oA2 = oA + radialSegs, oB2 = oB + radialSegs;
+      var iA2 = iA + radialSegs, iB2 = iB + radialSegs;
+      quad(iA2, oA2, iB2, oB2); // thetaEnd edge
+    }
+    // end caps at root (i=0) and tip (i=samples)
+    for (j = 0; j < radialSegs; j++) {
+      var rO = outerBase + j, rO2 = rO + 1, rI = innerBase + j, rI2 = rI + 1;
+      quad(rI, rO, rI2, rO2); // root cap
+      var tO = outerBase + samples * cols + j, tO2 = tO + 1;
+      var tI = innerBase + samples * cols + j, tI2 = tI + 1;
+      quad(tO, tI, tO2, tI2); // tip cap
+    }
+
+    var geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+    geo.setIndex(indices);
+    geo.computeVertexNormals();
+    return geo;
+  }
+
   // ---- renderer / scene ----
   var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
@@ -275,7 +342,7 @@
   camera.position.set(0, 0.1, 7.6);
   camera.lookAt(0, 0, 0);
 
-  scene.add(new THREE.HemisphereLight(0xfff6e0, 0x1d2c14, 0.9));
+  scene.add(new THREE.HemisphereLight(0xfff6e0, 0x2a2018, 0.9));
   var keyLight = new THREE.DirectionalLight(0xffffff, 1.15);
   keyLight.position.set(3, 4, 5);
   scene.add(keyLight);
@@ -318,7 +385,7 @@
       var thetaEnd = thetaStart + Math.PI / 2;
       var thetaC = (thetaStart + thetaEnd) / 2;
 
-      var geo = buildTubeGeometry(thetaStart + GAP_RAD / 2, thetaEnd - GAP_RAD / 2, 12, 26, 1.0);
+      var geo = buildSlabGeometry(thetaStart + GAP_RAD / 2, thetaEnd - GAP_RAD / 2, 12, 26, 1.0, 0.86);
       geo.translate(-root.x, -root.y, -root.z);
 
       var isOuter = i === 0 || i === STRIP_COUNT - 1;
@@ -480,7 +547,12 @@
       if (delta > 0) {
         var s = drag.strip;
         s.peelTarget = Math.min(1, s.peelTarget + delta / PEEL_RANGE_PX);
-        if (s.peelTarget >= 1 && !s.peeled) { s.peeled = true; checkComplete(); }
+        if (s.peelTarget >= 1 && !s.peeled) {
+          s.peeled = true;
+          var peeledStrips = current.strips.filter(function (st) { return st.peeled; }).length;
+          progressFill.style.width = (peeledStrips / STRIP_COUNT * 100).toFixed(1) + "%";
+          checkComplete();
+        }
       }
     } else {
       var ddx = p.px - drag.lastX, ddy = p.py - drag.lastY;
@@ -582,11 +654,9 @@
 
     // smooth peel: each strip eases toward its drag target
     var k = 1 - Math.exp(-PEEL_EASE * dt);
-    var sumTarget = 0;
     current.strips.forEach(function (s) {
       s.peel += (s.peelTarget - s.peel) * k;
       s.hinge.quaternion.setFromAxisAngle(s.axis, s.peel * s.angleMax);
-      sumTarget += s.peelTarget;
     });
 
     if (state === "playing") {
@@ -597,7 +667,6 @@
         bananaElapsed = (now - bananaStart) / 1000;
         timerEl.textContent = bananaElapsed.toFixed(1) + "s";
       }
-      progressFill.style.width = (sumTarget / STRIP_COUNT * 100).toFixed(1) + "%";
     } else if (state === "entering") {
       stateT = Math.min(1, stateT + dt / ENTER_DUR);
       current.setScale(easeOutBack(stateT));
