@@ -357,14 +357,11 @@
   // ---- rarity tiers: rolled once per banana, rarest checked first ----
   var RARITIES = [
     { name: "golden", chance: 0.01, label: "✨ Golden Banana",
-      core: 0xfff3b8, peelOuter: 0xffd700, peelInner: 0xffe34d,
-      roughness: 0.22, metalness: 0.85, emissive: 0x6b5200, emissiveIntensity: 0.55 },
+      core: 0xfff3b8, roughness: 0.22, metalness: 0.85, emissive: 0x6b5200, emissiveIntensity: 0.55 },
     { name: "silver", chance: 0.05, label: "⚪ Silver Banana",
-      core: 0xeef2f4, peelOuter: 0xc7d0d6, peelInner: 0xdde4e8,
-      roughness: 0.28, metalness: 0.8, emissive: 0x232a2e, emissiveIntensity: 0.25 },
+      core: 0xeef2f4, roughness: 0.28, metalness: 0.8, emissive: 0x232a2e, emissiveIntensity: 0.25 },
     { name: "bronze", chance: 0.10, label: "🟤 Bronze Banana",
-      core: 0xead9b8, peelOuter: 0xa9682f, peelInner: 0xc4823f,
-      roughness: 0.4, metalness: 0.6, emissive: 0x3a1f08, emissiveIntensity: 0.2 }
+      core: 0xead9b8, roughness: 0.4, metalness: 0.6, emissive: 0x3a1f08, emissiveIntensity: 0.2 }
   ];
   function pickRarity() {
     var r = Math.random(), acc = 0;
@@ -387,6 +384,8 @@
       color: rarity ? rarity.core : 0xf7eec9,
       roughness: rarity ? rarity.roughness : 0.5,
       metalness: rarity ? rarity.metalness : 0.04,
+      emissive: rarity ? rarity.emissive : 0x000000,
+      emissiveIntensity: rarity ? rarity.emissiveIntensity : 0,
       side: THREE.DoubleSide
     });
     var stemMat = mat({ color: 0x6b5b2a, roughness: 0.7 });
@@ -417,11 +416,9 @@
 
       var isOuter = i === 0 || i === STRIP_COUNT - 1;
       var stripMat = mat({
-        color: rarity ? (isOuter ? rarity.peelOuter : rarity.peelInner) : (isOuter ? 0xf3c63c : 0xffd84e),
-        roughness: rarity ? rarity.roughness : 0.52,
-        metalness: rarity ? rarity.metalness : 0.05,
-        emissive: rarity ? rarity.emissive : 0x3a2c00,
-        emissiveIntensity: rarity ? rarity.emissiveIntensity : 0.18,
+        color: isOuter ? 0xf3c63c : 0xffd84e,
+        roughness: 0.52, metalness: 0.05,
+        emissive: 0x3a2c00, emissiveIntensity: 0.18,
         side: THREE.DoubleSide
       });
       var mesh = new THREE.Mesh(geo, stripMat);
