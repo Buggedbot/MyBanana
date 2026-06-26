@@ -132,7 +132,8 @@
     opacity: 0;
     pointer-events: none;
     text-align: center;
-    white-space: nowrap;
+    white-space: normal;
+    max-width: 84%;
   }
   #toast.show {
     animation: pop 1.3s cubic-bezier(.2,.9,.3,1) forwards;
@@ -353,15 +354,41 @@
   rimLight.position.set(-1, 2, -4);
   scene.add(rimLight);
 
+  // ---- rarity tiers: rolled once per banana, rarest checked first ----
+  var RARITIES = [
+    { name: "golden", chance: 0.01, label: "✨ Golden Banana",
+      core: 0xfff3b8, peelOuter: 0xffd700, peelInner: 0xffe34d,
+      roughness: 0.22, metalness: 0.85, emissive: 0x6b5200, emissiveIntensity: 0.55 },
+    { name: "silver", chance: 0.05, label: "⚪ Silver Banana",
+      core: 0xeef2f4, peelOuter: 0xc7d0d6, peelInner: 0xdde4e8,
+      roughness: 0.28, metalness: 0.8, emissive: 0x232a2e, emissiveIntensity: 0.25 },
+    { name: "bronze", chance: 0.10, label: "🟤 Bronze Banana",
+      core: 0xead9b8, peelOuter: 0xa9682f, peelInner: 0xc4823f,
+      roughness: 0.4, metalness: 0.6, emissive: 0x3a1f08, emissiveIntensity: 0.2 }
+  ];
+  function pickRarity() {
+    var r = Math.random(), acc = 0;
+    for (var i = 0; i < RARITIES.length; i++) {
+      acc += RARITIES[i].chance;
+      if (r < acc) return RARITIES[i];
+    }
+    return null; // normal banana
+  }
+
   // ---- banana factory: each banana owns its own meshes + materials ----
-  function createBanana() {
+  function createBanana(rarity) {
     var group = new THREE.Group();
     group.rotation.set(0, 0.6, 0.12);
 
     var mats = [];
     function mat(opts) { var m = new THREE.MeshStandardMaterial(opts); mats.push(m); return m; }
 
-    var coreMat = mat({ color: 0xf7eec9, roughness: 0.5, metalness: 0.04, side: THREE.DoubleSide });
+    var coreMat = mat({
+      color: rarity ? rarity.core : 0xf7eec9,
+      roughness: rarity ? rarity.roughness : 0.5,
+      metalness: rarity ? rarity.metalness : 0.04,
+      side: THREE.DoubleSide
+    });
     var stemMat = mat({ color: 0x6b5b2a, roughness: 0.7 });
     var tipMat = mat({ color: 0x55471d, roughness: 0.7 });
 
@@ -390,9 +417,11 @@
 
       var isOuter = i === 0 || i === STRIP_COUNT - 1;
       var stripMat = mat({
-        color: isOuter ? 0xf3c63c : 0xffd84e,
-        roughness: 0.52, metalness: 0.05,
-        emissive: 0x3a2c00, emissiveIntensity: 0.18,
+        color: rarity ? (isOuter ? rarity.peelOuter : rarity.peelInner) : (isOuter ? 0xf3c63c : 0xffd84e),
+        roughness: rarity ? rarity.roughness : 0.52,
+        metalness: rarity ? rarity.metalness : 0.05,
+        emissive: rarity ? rarity.emissive : 0x3a2c00,
+        emissiveIntensity: rarity ? rarity.emissiveIntensity : 0.18,
         side: THREE.DoubleSide
       });
       var mesh = new THREE.Mesh(geo, stripMat);
@@ -414,7 +443,7 @@
     mats.forEach(function (m) { m.transparent = true; });
 
     return {
-      group: group, strips: strips, done: false,
+      group: group, strips: strips, done: false, rarity: rarity,
       setOpacity: function (o) { mats.forEach(function (m) { m.opacity = o; }); },
       setScale: function (s) { group.scale.setScalar(s); },
       dispose: function () {
@@ -470,9 +499,10 @@
   }
 
   // ---- game state ----
-  var current = createBanana();
+  var current = createBanana(pickRarity());
   current.setScale(0);
   scene.add(current.group);
+  if (current.rarity) showToast(current.rarity.label + "!");
 
   var state = "entering";   // entering | playing | exiting
   var stateT = 0;
@@ -574,15 +604,16 @@
       bananaElapsed = (performance.now() - bananaStart) / 1000;
       updateCount();
       bump(countEl);
+      var tag = current.rarity ? current.rarity.label + " — " : "";
       var msg;
       if (started && (best === null || bananaElapsed < best)) {
         best = bananaElapsed;
         try { localStorage.setItem("banana_best_time", String(best)); } catch (e) {}
         updateBest();
         bump(bestEl);
-        msg = "New best! " + bananaElapsed.toFixed(1) + "s ⚡";
+        msg = tag + "New best! " + bananaElapsed.toFixed(1) + "s ⚡";
       } else {
-        msg = "Peeled! " + bananaElapsed.toFixed(1) + "s ✨";
+        msg = tag + "Peeled! " + bananaElapsed.toFixed(1) + "s ✨";
       }
       showToast(msg);
       burst(current.group.localToWorld(new THREE.Vector3(0, 0, 0)));
@@ -593,7 +624,7 @@
 
   function spawnNext() {
     current.dispose();
-    current = createBanana();
+    current = createBanana(pickRarity());
     current.setScale(0);
     scene.add(current.group);
     state = "entering";
@@ -602,6 +633,7 @@
     bananaElapsed = 0;
     timerEl.textContent = "0.0s";
     progressFill.style.width = "0%";
+    if (current.rarity) showToast(current.rarity.label + "!");
   }
 
   // ---- UI helpers ----
