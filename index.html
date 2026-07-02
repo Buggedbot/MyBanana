@@ -445,8 +445,14 @@
       var radial = rf.N.clone().multiplyScalar(Math.cos(thetaC)).addScaledVector(rf.B, Math.sin(thetaC));
       var axis = rf.T.clone().cross(radial).normalize();
 
+      // spine point per lengthwise row, in the strip's local (root-relative) space
+      var spine = [];
+      for (var si = 0; si <= STRIP_SAMPLES; si++) {
+        spine.push(centerline(si / STRIP_SAMPLES).sub(root));
+      }
+
       strips.push({
-        mesh: mesh, hinge: hinge, axis: axis,
+        mesh: mesh, hinge: hinge, axis: axis, spine: spine,
         peel: 0, peelTarget: 0, peeled: false,
         basePos: geo.attributes.position.array.slice(0), lastPeel: -1
       });
@@ -704,27 +710,49 @@
     requestAnimationFrame(frame);
   }
 
-  // bend the strip progressively along its length: quick fold near the root,
-  // extra curl accumulating toward the tip, so it flexes like a real peel
-  var _bendQ = new THREE.Quaternion();
-  var _bendV = new THREE.Vector3();
+  // cumulative bend angle at lengthwise fraction t: a quick fold near the root
+  // plus curl accumulating toward the tip
+  function bendAngleAt(peel, t) {
+    var fold = 1 - Math.pow(1 - Math.min(t / 0.3, 1), 2); // rises fast, 1 by t=0.3
+    return peel * (PEEL_FOLD * fold + PEEL_CURL * t * t);
+  }
+
+  // bend the strip by chaining each spine segment onto the previous one: every
+  // segment keeps its original length, so the peel curls instead of stretching
+  var _accQ = new THREE.Quaternion();
+  var _stepQ = new THREE.Quaternion();
+  var _newSpine = new THREE.Vector3();
+  var _seg = new THREE.Vector3();
+  var _offV = new THREE.Vector3();
   function bendStrip(s) {
     s.lastPeel = s.peel;
     var geo = s.mesh.geometry;
     var arr = geo.attributes.position.array;
     var base = s.basePos;
+    var spine = s.spine;
     var cols = STRIP_RADIAL + 1;
     var shellVerts = (STRIP_SAMPLES + 1) * cols;
-    var offsets = [0, shellVerts]; // outer shell, inner shell
+
+    var accQ = _accQ.identity();
+    var newSpine = _newSpine.copy(spine[0]); // row 0 stays anchored at the hinge
+    var prevAngle = bendAngleAt(s.peel, 0);
+
     for (var row = 0; row <= STRIP_SAMPLES; row++) {
-      var t = row / STRIP_SAMPLES;
-      var fold = 1 - Math.pow(1 - Math.min(t / 0.3, 1), 2); // rises fast, 1 by t=0.3
-      _bendQ.setFromAxisAngle(s.axis, s.peel * (PEEL_FOLD * fold + PEEL_CURL * t * t));
-      for (var o = 0; o < offsets.length; o++) {
-        var ix = (offsets[o] + row * cols) * 3;
+      if (row > 0) {
+        var a = bendAngleAt(s.peel, row / STRIP_SAMPLES);
+        _stepQ.setFromAxisAngle(s.axis, a - prevAngle);
+        accQ.multiply(_stepQ);           // accumulate this segment's extra turn
+        prevAngle = a;
+        _seg.copy(spine[row]).sub(spine[row - 1]).applyQuaternion(accQ);
+        newSpine.add(_seg);              // advance along the bent spine, length preserved
+      }
+      var sp = spine[row];
+      for (var o = 0; o < 2; o++) {
+        var ix = ((o ? shellVerts : 0) + row * cols) * 3;
         for (var j = 0; j < cols; j++, ix += 3) {
-          _bendV.set(base[ix], base[ix + 1], base[ix + 2]).applyQuaternion(_bendQ);
-          arr[ix] = _bendV.x; arr[ix + 1] = _bendV.y; arr[ix + 2] = _bendV.z;
+          _offV.set(base[ix] - sp.x, base[ix + 1] - sp.y, base[ix + 2] - sp.z)
+            .applyQuaternion(accQ).add(newSpine);
+          arr[ix] = _offV.x; arr[ix + 1] = _offV.y; arr[ix + 2] = _offV.z;
         }
       }
     }
