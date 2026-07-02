@@ -202,10 +202,15 @@
   var STRIP_COUNT = 4;
   var LENGTH = 3.6;
   var BASE_R = 0.6;
-  var BOW = 0.5;
+  var BOW = 0.58;
   var GAP_RAD = (4 * Math.PI) / 180;
-  var PEEL_ANGLE_MAX = (205 * Math.PI) / 180;
-  var PEEL_RANGE_PX = 150;     // drag distance (px) for a full peel
+  var STRIP_RADIAL = 12;       // strip cross-section segments
+  var STRIP_SAMPLES = 26;      // strip lengthwise segments
+  var RIDGE_AMP = 0.05;        // peel ridge depth (bananas are slightly square in section)
+  var PEEL_FOLD = (140 * Math.PI) / 180;  // fold near the root at full peel
+  var PEEL_CURL = (115 * Math.PI) / 180;  // extra curl accumulated toward the tip
+  var PEEL_SNAP = 0.45;        // release past this and the peel finishes itself
+  var PEEL_RANGE_PX = 120;     // drag distance (px) for a full peel
   var ROTATE_SPEED = 0.0065;
   var PEEL_EASE = 9;           // how snappily strips chase the drag target
   var AUTO_SPIN = 0.18;        // idle rotation (rad/s)
@@ -219,7 +224,8 @@
     return new THREE.Vector3(BOW * Math.sin(Math.PI * t), (t - 0.5) * LENGTH, 0);
   }
   function radiusAt(t) {
-    return BASE_R * (0.3 + 0.7 * Math.sin(Math.PI * Math.pow(t, 0.92)));
+    // fuller through the middle, necking in toward the stem and tapering to the tip
+    return BASE_R * (0.24 + 0.8 * Math.pow(Math.sin(Math.PI * Math.pow(t, 0.95)), 0.72));
   }
   function tangentAt(t) {
     var e = 0.01;
@@ -278,10 +284,11 @@
         for (j = 0; j <= radialSegs; j++) {
           var theta = thetaStart + (thetaEnd - thetaStart) * (j / radialSegs);
           var ct = Math.cos(theta), st = Math.sin(theta);
+          var rr = r * (1 + RIDGE_AMP * Math.cos(4 * theta)); // raised ridges along the seams
           positions.push(
-            c.x + f.N.x * r * ct + f.B.x * r * st,
-            c.y + f.N.y * r * ct + f.B.y * r * st,
-            c.z + f.N.z * r * ct + f.B.z * r * st
+            c.x + f.N.x * rr * ct + f.B.x * rr * st,
+            c.y + f.N.y * rr * ct + f.B.y * rr * st,
+            c.z + f.N.z * rr * ct + f.B.z * rr * st
           );
         }
       }
@@ -396,13 +403,19 @@
     var root = centerline(0), tip = centerline(1), rf = frameAt(0);
     var negT0 = rf.T.clone().negate();
 
-    var stem = new THREE.Mesh(new THREE.ConeGeometry(0.16, 0.36, 12), stemMat);
-    stem.position.copy(root).addScaledVector(negT0, 0.16);
+    var stem = new THREE.Mesh(new THREE.CylinderGeometry(0.085, 0.15, 0.44, 10), stemMat);
+    stem.position.copy(root).addScaledVector(negT0, 0.2);
     stem.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), negT0);
     group.add(stem);
 
+    var stemCap = new THREE.Mesh(new THREE.SphereGeometry(0.09, 10, 8), tipMat);
+    stemCap.position.copy(root).addScaledVector(negT0, 0.42);
+    group.add(stemCap);
+
     var tipMesh = new THREE.Mesh(new THREE.SphereGeometry(0.1, 12, 10), tipMat);
     tipMesh.position.copy(tip);
+    tipMesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), frameAt(1).T);
+    tipMesh.scale.set(0.85, 1.5, 0.85);
     group.add(tipMesh);
 
     var strips = [];
@@ -411,7 +424,7 @@
       var thetaEnd = thetaStart + Math.PI / 2;
       var thetaC = (thetaStart + thetaEnd) / 2;
 
-      var geo = buildSlabGeometry(thetaStart + GAP_RAD / 2, thetaEnd - GAP_RAD / 2, 12, 26, 1.0, 0.86);
+      var geo = buildSlabGeometry(thetaStart + GAP_RAD / 2, thetaEnd - GAP_RAD / 2, STRIP_RADIAL, STRIP_SAMPLES, 1.0, 0.86);
       geo.translate(-root.x, -root.y, -root.z);
 
       var isOuter = i === 0 || i === STRIP_COUNT - 1;
@@ -422,6 +435,7 @@
         side: THREE.DoubleSide
       });
       var mesh = new THREE.Mesh(geo, stripMat);
+      mesh.frustumCulled = false; // vertices bend at runtime, so the static bounds lie
 
       var hinge = new THREE.Object3D();
       hinge.position.copy(root);
@@ -433,7 +447,8 @@
 
       strips.push({
         mesh: mesh, hinge: hinge, axis: axis,
-        peel: 0, peelTarget: 0, peeled: false, angleMax: PEEL_ANGLE_MAX
+        peel: 0, peelTarget: 0, peeled: false,
+        basePos: geo.attributes.position.array.slice(0), lastPeel: -1
       });
     }
 
@@ -574,12 +589,7 @@
       if (delta > 0) {
         var s = drag.strip;
         s.peelTarget = Math.min(1, s.peelTarget + delta / PEEL_RANGE_PX);
-        if (s.peelTarget >= 1 && !s.peeled) {
-          s.peeled = true;
-          var peeledStrips = current.strips.filter(function (st) { return st.peeled; }).length;
-          progressFill.style.width = (peeledStrips / STRIP_COUNT * 100).toFixed(1) + "%";
-          checkComplete();
-        }
+        if (s.peelTarget >= 1 && !s.peeled) completeStrip(s);
       }
     } else {
       var ddx = p.px - drag.lastX, ddy = p.py - drag.lastY;
@@ -590,7 +600,23 @@
     evt.preventDefault();
   }
 
-  function onPointerUp() { drag = null; }
+  function onPointerUp() {
+    // a good tug is enough: past the snap point the peel finishes itself,
+    // otherwise it springs back closed
+    if (drag && drag.mode === "peel" && !drag.strip.peeled) {
+      var s = drag.strip;
+      if (s.peelTarget >= PEEL_SNAP) { s.peelTarget = 1; completeStrip(s); }
+      else s.peelTarget = 0;
+    }
+    drag = null;
+  }
+
+  function completeStrip(s) {
+    s.peeled = true;
+    var peeledStrips = current.strips.filter(function (st) { return st.peeled; }).length;
+    progressFill.style.width = (peeledStrips / STRIP_COUNT * 100).toFixed(1) + "%";
+    checkComplete();
+  }
 
   function checkComplete() {
     if (current.done) return;
@@ -678,6 +704,35 @@
     requestAnimationFrame(frame);
   }
 
+  // bend the strip progressively along its length: quick fold near the root,
+  // extra curl accumulating toward the tip, so it flexes like a real peel
+  var _bendQ = new THREE.Quaternion();
+  var _bendV = new THREE.Vector3();
+  function bendStrip(s) {
+    s.lastPeel = s.peel;
+    var geo = s.mesh.geometry;
+    var arr = geo.attributes.position.array;
+    var base = s.basePos;
+    var cols = STRIP_RADIAL + 1;
+    var shellVerts = (STRIP_SAMPLES + 1) * cols;
+    var offsets = [0, shellVerts]; // outer shell, inner shell
+    for (var row = 0; row <= STRIP_SAMPLES; row++) {
+      var t = row / STRIP_SAMPLES;
+      var fold = 1 - Math.pow(1 - Math.min(t / 0.3, 1), 2); // rises fast, 1 by t=0.3
+      _bendQ.setFromAxisAngle(s.axis, s.peel * (PEEL_FOLD * fold + PEEL_CURL * t * t));
+      for (var o = 0; o < offsets.length; o++) {
+        var ix = (offsets[o] + row * cols) * 3;
+        for (var j = 0; j < cols; j++, ix += 3) {
+          _bendV.set(base[ix], base[ix + 1], base[ix + 2]).applyQuaternion(_bendQ);
+          arr[ix] = _bendV.x; arr[ix + 1] = _bendV.y; arr[ix + 2] = _bendV.z;
+        }
+      }
+    }
+    geo.attributes.position.needsUpdate = true;
+    geo.computeVertexNormals();
+    geo.computeBoundingSphere(); // keep raycasting accurate against the bent shape
+  }
+
   function update(dt, now) {
     var g = current.group;
 
@@ -685,7 +740,7 @@
     var k = 1 - Math.exp(-PEEL_EASE * dt);
     current.strips.forEach(function (s) {
       s.peel += (s.peelTarget - s.peel) * k;
-      s.hinge.quaternion.setFromAxisAngle(s.axis, s.peel * s.angleMax);
+      if (Math.abs(s.peel - s.lastPeel) > 0.0004) bendStrip(s);
     });
 
     if (state === "playing") {
