@@ -240,7 +240,7 @@
   }
 
   function buildTubeGeometry(thetaStart, thetaEnd, radialSegs, samples, radiusScale) {
-    var positions = [], indices = [];
+    var positions = [], indices = [], uvs = [];
     var cols = radialSegs + 1;
     var i, j;
     for (i = 0; i <= samples; i++) {
@@ -255,6 +255,7 @@
           c.y + f.N.y * r * ct + f.B.y * r * st,
           c.z + f.N.z * r * ct + f.B.z * r * st
         );
+        uvs.push(j / radialSegs, t);
       }
     }
     for (i = 0; i < samples; i++) {
@@ -265,6 +266,7 @@
     }
     var geo = new THREE.BufferGeometry();
     geo.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+    geo.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
     geo.setIndex(indices);
     geo.computeVertexNormals();
     return geo;
@@ -272,7 +274,7 @@
 
   // closed outer+inner shell with end/side walls, so peel strips read as solid rather than paper-thin
   function buildSlabGeometry(thetaStart, thetaEnd, radialSegs, samples, outerScale, innerScale) {
-    var positions = [], indices = [];
+    var positions = [], indices = [], uvs = [];
     var cols = radialSegs + 1;
     var i, j;
 
@@ -290,6 +292,7 @@
             c.y + f.N.y * rr * ct + f.B.y * rr * st,
             c.z + f.N.z * rr * ct + f.B.z * rr * st
           );
+          uvs.push(j / radialSegs, t);
         }
       }
     }
@@ -333,6 +336,7 @@
 
     var geo = new THREE.BufferGeometry();
     geo.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+    geo.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
     geo.setIndex(indices);
     geo.computeVertexNormals();
     return geo;
@@ -361,14 +365,137 @@
   rimLight.position.set(-1, 2, -4);
   scene.add(rimLight);
 
-  // ---- rarity tiers: rolled once per banana, rarest checked first ----
+  // ---- procedural textures + environment (built once, so no external files) ----
+  function makeCanvas(s) { var c = document.createElement("canvas"); c.width = c.height = s; return c; }
+  function canvasTex(c) {
+    var t = new THREE.CanvasTexture(c);
+    t.wrapS = t.wrapT = THREE.RepeatWrapping;
+    if (THREE.SRGBColorSpace) t.colorSpace = THREE.SRGBColorSpace;
+    t.anisotropy = 4;
+    return t;
+  }
+
+  // high-contrast studio gradient with a crisp horizon and bright spots, so
+  // polished metals show real hotspots and read as shiny minerals, not matte
+  function buildEnvironment() {
+    var c = makeCanvas(512), x = c.getContext("2d");
+    var g = x.createLinearGradient(0, 0, 0, 512);
+    g.addColorStop(0.0, "#ffffff"); g.addColorStop(0.34, "#efe6d0");
+    g.addColorStop(0.49, "#9a8a70"); g.addColorStop(0.5, "#2c251d"); // crisp horizon step
+    g.addColorStop(1.0, "#080706");
+    x.fillStyle = g; x.fillRect(0, 0, 512, 512);
+    function blob(cx, cy, r, a) {
+      var rg = x.createRadialGradient(cx, cy, 0, cx, cy, r);
+      rg.addColorStop(0, "rgba(255,255,255," + a + ")"); rg.addColorStop(1, "rgba(255,255,255,0)");
+      x.fillStyle = rg; x.beginPath(); x.arc(cx, cy, r, 0, 6.2832); x.fill();
+    }
+    blob(150, 110, 70, 1.0);   // crisp key highlight
+    blob(150, 110, 150, 0.35); // its soft halo
+    blob(400, 80, 44, 1.0);    // crisp secondary
+    blob(300, 170, 90, 0.4);
+    var tex = new THREE.CanvasTexture(c);
+    tex.mapping = THREE.EquirectangularReflectionMapping;
+    var pmrem = new THREE.PMREMGenerator(renderer);
+    var env = pmrem.fromEquirectangular(tex).texture;
+    tex.dispose(); pmrem.dispose();
+    return env;
+  }
+
+  // yellow peel with faint streaks and brown freckles
+  function buildPeelTexture() {
+    var c = makeCanvas(512), x = c.getContext("2d");
+    var g = x.createLinearGradient(0, 0, 512, 0);
+    g.addColorStop(0, "#e6b636"); g.addColorStop(0.5, "#ffd94b"); g.addColorStop(1, "#e6b636");
+    x.fillStyle = g; x.fillRect(0, 0, 512, 512);
+    x.globalAlpha = 0.09; x.strokeStyle = "#8a6a12";
+    for (var i = 0; i < 46; i++) {
+      var xx = Math.random() * 512; x.lineWidth = 1 + Math.random() * 2;
+      x.beginPath(); x.moveTo(xx, 0); x.lineTo(xx + (Math.random() * 24 - 12), 512); x.stroke();
+    }
+    x.globalAlpha = 1;
+    for (var n = 0; n < 460; n++) {
+      var fx = Math.random() * 512, fy = Math.random() * 512, r = Math.random() * 2.4 + 0.3;
+      x.fillStyle = "rgba(" + (55 + Math.random() * 45 | 0) + "," + (38 + Math.random() * 26 | 0) + ",8," + (0.22 + Math.random() * 0.5).toFixed(2) + ")";
+      x.beginPath(); x.arc(fx, fy, r, 0, 6.2832); x.fill();
+    }
+    var t = canvasTex(c); t.repeat.set(1, 2); return t;
+  }
+
+  // pale flesh with faint fibers and a line of seed specks
+  function buildFleshTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#f4e9c4"; x.fillRect(0, 0, 256, 256);
+    x.globalAlpha = 0.14; x.strokeStyle = "#dcc891"; x.lineWidth = 2;
+    for (var i = 0; i < 4; i++) { var xx = 60 + i * 46; x.beginPath(); x.moveTo(xx, 0); x.lineTo(xx, 256); x.stroke(); }
+    x.globalAlpha = 1;
+    for (var n = 0; n < 44; n++) {
+      x.fillStyle = "rgba(60,45,25,0.5)";
+      x.beginPath(); x.arc(128 + (Math.random() * 22 - 11), Math.random() * 256, 1.2, 0, 6.2832); x.fill();
+    }
+    return canvasTex(c);
+  }
+
+  // mottled brown bruising for the rotten tier
+  function buildRottenTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#8a7638"; x.fillRect(0, 0, 256, 256);
+    for (var n = 0; n < 90; n++) {
+      var fx = Math.random() * 256, fy = Math.random() * 256, r = Math.random() * 24 + 4;
+      var g = x.createRadialGradient(fx, fy, 0, fx, fy, r);
+      var dark = Math.random() < 0.5;
+      g.addColorStop(0, dark ? "rgba(28,18,8,0.9)" : "rgba(96,74,32,0.6)");
+      g.addColorStop(1, "rgba(60,50,25,0)");
+      x.fillStyle = g; x.beginPath(); x.arc(fx, fy, r, 0, 6.2832); x.fill();
+    }
+    return canvasTex(c);
+  }
+
+  // red explosive stick with a hazard-striped label band around the middle
+  function buildTNTTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#b81e15"; x.fillRect(0, 0, 256, 256);
+    x.globalAlpha = 0.12; x.strokeStyle = "#000"; x.lineWidth = 2;
+    for (var i = 0; i < 10; i++) { var xx = i * 26; x.beginPath(); x.moveTo(xx, 0); x.lineTo(xx, 256); x.stroke(); }
+    x.globalAlpha = 1;
+    x.fillStyle = "#ecdca8"; x.fillRect(0, 100, 256, 58);          // label band
+    x.save(); x.beginPath(); x.rect(0, 100, 256, 58); x.clip();     // hazard stripes
+    x.fillStyle = "#1a1a1a";
+    for (var s = -2; s < 12; s++) {
+      var bx = s * 34;
+      x.beginPath(); x.moveTo(bx, 100); x.lineTo(bx + 16, 100);
+      x.lineTo(bx + 16 + 58, 158); x.lineTo(bx + 58, 158); x.closePath(); x.fill();
+    }
+    x.restore();
+    x.fillStyle = "#111"; x.font = "bold 30px sans-serif"; x.textAlign = "center"; x.textBaseline = "middle";
+    x.fillText("TNT", 64, 129); x.fillText("TNT", 192, 129);
+    var t = canvasTex(c); t.repeat.set(3, 1); return t;
+  }
+
+  scene.environment = buildEnvironment();
+  var TEX = {
+    peel: buildPeelTexture(), flesh: buildFleshTexture(),
+    rotten: buildRottenTexture(), tnt: buildTNTTexture()
+  };
+
+  // ---- rarity tiers: each banana rolls one; the inner fruit takes the material ----
+  var NORMAL_CORE = { color: 0xf3e8c0, roughness: 0.62, metalness: 0.02, mapKind: "flesh" };
   var RARITIES = [
-    { name: "golden", chance: 0.01, label: "✨ Golden Banana",
-      core: 0xfff3b8, roughness: 0.22, metalness: 0.85, emissive: 0x6b5200, emissiveIntensity: 0.55 },
-    { name: "silver", chance: 0.05, label: "⚪ Silver Banana",
-      core: 0xeef2f4, roughness: 0.28, metalness: 0.8, emissive: 0x232a2e, emissiveIntensity: 0.25 },
-    { name: "bronze", chance: 0.10, label: "🟤 Bronze Banana",
-      core: 0xead9b8, roughness: 0.4, metalness: 0.6, emissive: 0x3a1f08, emissiveIntensity: 0.2 }
+    { name: "golden", chance: 0.010, label: "✨ Golden Banana",
+      core: { color: 0xffc21e, metalness: 1.0, roughness: 0.11, emissive: 0x3a2600, emissiveIntensity: 0.12, envMapIntensity: 2.6 } },
+    { name: "crystal", chance: 0.012, label: "💎 Crystal Banana", flat: true, pulse: true,
+      core: { physical: true, color: 0xa6ecff, metalness: 0.0, roughness: 0.04, transmission: 0.55, thickness: 1.3, ior: 1.9,
+        clearcoat: 1.0, clearcoatRoughness: 0.05, emissive: 0x2aa8ff, emissiveIntensity: 0.5, envMapIntensity: 2.2 } },
+    { name: "silver", chance: 0.020, label: "⚪ Silver Banana",
+      core: { color: 0xe6ebf0, metalness: 1.0, roughness: 0.07, emissive: 0x000000, emissiveIntensity: 0, envMapIntensity: 2.8 } },
+    { name: "tnt", chance: 0.020, label: "🧨 TNT Banana", pulse: true,
+      core: { color: 0xffffff, mapKind: "tnt", metalness: 0.1, roughness: 0.5, emissive: 0xff1e00, emissiveIntensity: 0.22, envMapIntensity: 0.6 } },
+    { name: "bronze", chance: 0.035, label: "🟤 Bronze Banana",
+      core: { color: 0xc8752a, metalness: 1.0, roughness: 0.2, emissive: 0x1c0d02, emissiveIntensity: 0.08, envMapIntensity: 2.2 } },
+    { name: "chocolate", chance: 0.055, label: "🍫 Chocolate Banana",
+      core: { physical: true, color: 0x3a2214, metalness: 0.0, roughness: 0.26, clearcoat: 0.9, clearcoatRoughness: 0.18,
+        emissive: 0x120a04, emissiveIntensity: 0.1, envMapIntensity: 1.0 } },
+    { name: "rotten", chance: 0.075, label: "🤢 Rotten Banana",
+      core: { color: 0x7d6c3c, metalness: 0.0, roughness: 0.92, emissive: 0x140e05, emissiveIntensity: 0.06, mapKind: "rotten" } }
   ];
   function pickRarity() {
     var r = Math.random(), acc = 0;
@@ -379,6 +506,31 @@
     return null; // normal banana
   }
 
+  // build the inner-fruit material from a core spec (physical for glass/chocolate)
+  function makeCoreMaterial(rarity) {
+    var d = rarity ? rarity.core : NORMAL_CORE;
+    var opts = {
+      color: d.color,
+      roughness: d.roughness != null ? d.roughness : 0.5,
+      metalness: d.metalness != null ? d.metalness : 0.0,
+      emissive: d.emissive != null ? d.emissive : 0x000000,
+      emissiveIntensity: d.emissiveIntensity != null ? d.emissiveIntensity : 0,
+      envMapIntensity: d.envMapIntensity != null ? d.envMapIntensity : 1.0,
+      side: THREE.DoubleSide
+    };
+    if (d.mapKind) opts.map = TEX[d.mapKind];
+    if (rarity && rarity.flat) opts.flatShading = true;
+    if (d.physical) {
+      if (d.transmission != null) opts.transmission = d.transmission;
+      if (d.thickness != null) opts.thickness = d.thickness;
+      if (d.ior != null) opts.ior = d.ior;
+      if (d.clearcoat != null) opts.clearcoat = d.clearcoat;
+      if (d.clearcoatRoughness != null) opts.clearcoatRoughness = d.clearcoatRoughness;
+      return new THREE.MeshPhysicalMaterial(opts);
+    }
+    return new THREE.MeshStandardMaterial(opts);
+  }
+
   // ---- banana factory: each banana owns its own meshes + materials ----
   function createBanana(rarity) {
     var group = new THREE.Group();
@@ -387,14 +539,8 @@
     var mats = [];
     function mat(opts) { var m = new THREE.MeshStandardMaterial(opts); mats.push(m); return m; }
 
-    var coreMat = mat({
-      color: rarity ? rarity.core : 0xf7eec9,
-      roughness: rarity ? rarity.roughness : 0.5,
-      metalness: rarity ? rarity.metalness : 0.04,
-      emissive: rarity ? rarity.emissive : 0x000000,
-      emissiveIntensity: rarity ? rarity.emissiveIntensity : 0,
-      side: THREE.DoubleSide
-    });
+    var coreMat = makeCoreMaterial(rarity);
+    mats.push(coreMat);
     var stemMat = mat({ color: 0x6b5b2a, roughness: 0.7 });
     var tipMat = mat({ color: 0x55471d, roughness: 0.7 });
 
@@ -427,11 +573,11 @@
       var geo = buildSlabGeometry(thetaStart + GAP_RAD / 2, thetaEnd - GAP_RAD / 2, STRIP_RADIAL, STRIP_SAMPLES, 1.0, 0.86);
       geo.translate(-root.x, -root.y, -root.z);
 
-      var isOuter = i === 0 || i === STRIP_COUNT - 1;
       var stripMat = mat({
-        color: isOuter ? 0xf3c63c : 0xffd84e,
-        roughness: 0.52, metalness: 0.05,
-        emissive: 0x3a2c00, emissiveIntensity: 0.18,
+        map: TEX.peel, color: 0xffffff,
+        roughness: 0.5, metalness: 0.04,
+        emissive: 0x3a2c00, emissiveIntensity: 0.14,
+        envMapIntensity: 0.5,
         side: THREE.DoubleSide
       });
       var mesh = new THREE.Mesh(geo, stripMat);
@@ -461,7 +607,7 @@
     mats.forEach(function (m) { m.transparent = true; });
 
     return {
-      group: group, strips: strips, done: false, rarity: rarity,
+      group: group, strips: strips, done: false, rarity: rarity, coreMat: coreMat,
       setOpacity: function (o) { mats.forEach(function (m) { m.opacity = o; }); },
       setScale: function (s) { group.scale.setScalar(s); },
       dispose: function () {
@@ -770,6 +916,12 @@
       s.peel += (s.peelTarget - s.peel) * k;
       if (Math.abs(s.peel - s.lastPeel) > 0.0004) bendStrip(s);
     });
+
+    // crystal shimmer / TNT danger flash
+    if (current.rarity && current.rarity.pulse) {
+      var base = current.rarity.core.emissiveIntensity || 0;
+      current.coreMat.emissiveIntensity = base + base * 1.2 * (0.5 + 0.5 * Math.sin(now * 0.008));
+    }
 
     if (state === "playing") {
       if (!drag) g.rotation.y += AUTO_SPIN * dt;           // gentle idle spin
