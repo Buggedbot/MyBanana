@@ -435,17 +435,23 @@
     return canvasTex(c);
   }
 
-  // mottled brown bruising for the rotten tier
+  // mottled bruising for the rotten tier: big dark patches with base showing between
   function buildRottenTexture() {
     var c = makeCanvas(256), x = c.getContext("2d");
-    x.fillStyle = "#8a7638"; x.fillRect(0, 0, 256, 256);
-    for (var n = 0; n < 90; n++) {
-      var fx = Math.random() * 256, fy = Math.random() * 256, r = Math.random() * 24 + 4;
+    x.fillStyle = "#a88f47"; x.fillRect(0, 0, 256, 256);
+    for (var n = 0; n < 26; n++) {
+      var fx = Math.random() * 256, fy = Math.random() * 256, r = Math.random() * 26 + 10;
       var g = x.createRadialGradient(fx, fy, 0, fx, fy, r);
-      var dark = Math.random() < 0.5;
-      g.addColorStop(0, dark ? "rgba(28,18,8,0.9)" : "rgba(96,74,32,0.6)");
-      g.addColorStop(1, "rgba(60,50,25,0)");
-      x.fillStyle = g; x.beginPath(); x.arc(fx, fy, r, 0, 6.2832); x.fill();
+      g.addColorStop(0, "rgba(20,12,4,0.95)");
+      g.addColorStop(0.7, "rgba(34,22,8,0.8)");
+      g.addColorStop(1, "rgba(50,36,14,0)");
+      x.fillStyle = g;
+      x.save(); x.translate(fx, fy); x.scale(1, 0.55 + Math.random()); // squashed, organic
+      x.beginPath(); x.arc(0, 0, r, 0, 6.2832); x.fill(); x.restore();
+    }
+    for (var m = 0; m < 130; m++) { // small freckles between the patches
+      x.fillStyle = "rgba(45,30,10," + (0.3 + Math.random() * 0.4).toFixed(2) + ")";
+      x.beginPath(); x.arc(Math.random() * 256, Math.random() * 256, Math.random() * 2.5 + 0.6, 0, 6.2832); x.fill();
     }
     return canvasTex(c);
   }
@@ -481,21 +487,21 @@
   var NORMAL_CORE = { color: 0xf3e8c0, roughness: 0.62, metalness: 0.02, mapKind: "flesh" };
   var RARITIES = [
     { name: "golden", chance: 0.010, label: "✨ Golden Banana",
-      core: { color: 0xffc21e, metalness: 1.0, roughness: 0.11, emissive: 0x3a2600, emissiveIntensity: 0.12, envMapIntensity: 2.6 } },
+      core: { color: 0xe8a30c, metalness: 1.0, roughness: 0.16, emissive: 0x5c3a00, emissiveIntensity: 0.22, envMapIntensity: 2.2 } },
     { name: "crystal", chance: 0.012, label: "💎 Crystal Banana", flat: true, pulse: true,
-      core: { physical: true, color: 0xa6ecff, metalness: 0.0, roughness: 0.04, transmission: 0.55, thickness: 1.3, ior: 1.9,
-        clearcoat: 1.0, clearcoatRoughness: 0.05, emissive: 0x2aa8ff, emissiveIntensity: 0.5, envMapIntensity: 2.2 } },
+      core: { physical: true, color: 0x3fb8f2, metalness: 0.0, roughness: 0.06, transmission: 0.45, thickness: 1.3, ior: 1.9,
+        clearcoat: 1.0, clearcoatRoughness: 0.05, emissive: 0x0a5cd6, emissiveIntensity: 0.65, envMapIntensity: 1.8 } },
     { name: "silver", chance: 0.020, label: "⚪ Silver Banana",
-      core: { color: 0xe6ebf0, metalness: 1.0, roughness: 0.07, emissive: 0x000000, emissiveIntensity: 0, envMapIntensity: 2.8 } },
+      core: { color: 0x8e99a6, metalness: 1.0, roughness: 0.26, emissive: 0x0a0e14, emissiveIntensity: 0.15, envMapIntensity: 1.7 } },
     { name: "tnt", chance: 0.020, label: "🧨 TNT Banana", pulse: true,
       core: { color: 0xffffff, mapKind: "tnt", metalness: 0.1, roughness: 0.5, emissive: 0xff1e00, emissiveIntensity: 0.22, envMapIntensity: 0.6 } },
     { name: "bronze", chance: 0.035, label: "🟤 Bronze Banana",
-      core: { color: 0xc8752a, metalness: 1.0, roughness: 0.2, emissive: 0x1c0d02, emissiveIntensity: 0.08, envMapIntensity: 2.2 } },
+      core: { color: 0x9a5c22, metalness: 1.0, roughness: 0.24, emissive: 0x2e1503, emissiveIntensity: 0.14, envMapIntensity: 2.0 } },
     { name: "chocolate", chance: 0.055, label: "🍫 Chocolate Banana",
       core: { physical: true, color: 0x3a2214, metalness: 0.0, roughness: 0.26, clearcoat: 0.9, clearcoatRoughness: 0.18,
         emissive: 0x120a04, emissiveIntensity: 0.1, envMapIntensity: 1.0 } },
     { name: "rotten", chance: 0.075, label: "🤢 Rotten Banana",
-      core: { color: 0x7d6c3c, metalness: 0.0, roughness: 0.92, emissive: 0x140e05, emissiveIntensity: 0.06, mapKind: "rotten" } }
+      core: { color: 0xd8cb9e, metalness: 0.0, roughness: 0.92, emissive: 0x140e05, emissiveIntensity: 0.06, mapKind: "rotten" } }
   ];
   function pickRarity() {
     var r = Math.random(), acc = 0;
