@@ -514,26 +514,29 @@
   // ---- rarity tiers: each banana rolls one; the inner fruit takes the material ----
   var NORMAL_CORE = { color: 0xf3e8c0, roughness: 0.62, metalness: 0.02, mapKind: "flesh" };
   var RARITIES = [
-    { name: "golden", chance: 0.010, label: "✨ Golden Banana",
+    { name: "golden", label: "✨ Golden Banana",
       core: { physical: true, color: 0xf0ad10, metalness: 1.0, roughness: 0.24, clearcoat: 0.5, clearcoatRoughness: 0.25,
         emissive: 0x4a2e00, emissiveIntensity: 0.16, envMapIntensity: 1.5 } },
-    { name: "crystal", chance: 0.012, label: "💎 Crystal Banana", flat: true, pulse: true,
+    { name: "crystal", label: "💎 Crystal Banana", flat: true, pulse: true,
       core: { physical: true, color: 0x3fb8f2, metalness: 0.0, roughness: 0.06, transmission: 0.45, thickness: 1.3, ior: 1.9,
         clearcoat: 1.0, clearcoatRoughness: 0.05, emissive: 0x0a5cd6, emissiveIntensity: 0.65, envMapIntensity: 1.8 } },
-    { name: "silver", chance: 0.020, label: "⚪ Silver Banana",
+    { name: "silver", label: "⚪ Silver Banana",
       core: { physical: true, color: 0xb2bac4, metalness: 1.0, roughness: 0.24, clearcoat: 0.5, clearcoatRoughness: 0.25,
         emissive: 0x0a0e14, emissiveIntensity: 0.12, envMapIntensity: 1.4 } },
-    { name: "tnt", chance: 0.020, label: "🧨 TNT Banana", pulse: true,
+    { name: "tnt", label: "🧨 TNT Banana", pulse: true,
       core: { color: 0xffffff, mapKind: "tnt", metalness: 0.1, roughness: 0.5, emissive: 0xff1e00, emissiveIntensity: 0.22, envMapIntensity: 0.6 } },
-    { name: "bronze", chance: 0.035, label: "🟤 Bronze Banana",
+    { name: "bronze", label: "🟤 Bronze Banana",
       core: { physical: true, color: 0xa86428, metalness: 1.0, roughness: 0.28, clearcoat: 0.4, clearcoatRoughness: 0.28,
         emissive: 0x241002, emissiveIntensity: 0.12, envMapIntensity: 1.4 } },
-    { name: "chocolate", chance: 0.055, label: "🍫 Chocolate Banana",
+    { name: "chocolate", label: "🍫 Chocolate Banana",
       core: { physical: true, color: 0xffffff, mapKind: "chocolate", metalness: 0.0, roughness: 0.3, clearcoat: 0.9, clearcoatRoughness: 0.18,
         emissive: 0x120a04, emissiveIntensity: 0.1, envMapIntensity: 1.0 } },
-    { name: "rotten", chance: 0.075, label: "🤢 Rotten Banana",
+    { name: "rotten", label: "🤢 Rotten Banana",
       core: { color: 0xd8cb9e, metalness: 0.0, roughness: 0.92, emissive: 0x140e05, emissiveIntensity: 0.06, mapKind: "rotten" } }
   ];
+  // 50/50: half of all bananas are rare, split evenly across the tiers
+  var RARE_TOTAL = 0.5;
+  RARITIES.forEach(function (r) { r.chance = RARE_TOTAL / RARITIES.length; });
   function pickRarity() {
     var r = Math.random(), acc = 0;
     for (var i = 0; i < RARITIES.length; i++) {
@@ -729,6 +732,54 @@
   function easeInCubic(x) { return x * x * x; }
   function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
 
+  // ---- sound effects (synthesized with Web Audio, no files) ----
+  var audioCtx = null;
+  var noiseBuf = null;
+  function ensureAudio() {
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    if (!audioCtx) audioCtx = new AC();
+    if (audioCtx.state === "suspended") audioCtx.resume();
+    return audioCtx;
+  }
+  function getNoise(ctx) {
+    if (!noiseBuf) {
+      noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 0.5, ctx.sampleRate);
+      var d = noiseBuf.getChannelData(0);
+      for (var i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    }
+    return noiseBuf;
+  }
+  // short filtered-noise "rip"; pitch rises as the peel opens, big = final tear
+  function playRip(progress, big) {
+    var ctx = ensureAudio(); if (!ctx) return;
+    var t = ctx.currentTime, dur = big ? 0.24 : 0.08;
+    var src = ctx.createBufferSource(); src.buffer = getNoise(ctx);
+    var bp = ctx.createBiquadFilter(); bp.type = "bandpass";
+    bp.frequency.setValueAtTime(500 + progress * 900, t);
+    bp.frequency.exponentialRampToValueAtTime(900 + progress * 1400, t + dur);
+    bp.Q.value = big ? 1.8 : 4;
+    var g = ctx.createGain();
+    g.gain.setValueAtTime(big ? 0.4 : 0.15, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    src.connect(bp); bp.connect(g); g.connect(ctx.destination);
+    src.start(t, Math.random() * 0.25); src.stop(t + dur + 0.02);
+  }
+  // ascending sparkle chime for a rare reveal
+  function playSparkle() {
+    var ctx = ensureAudio(); if (!ctx) return;
+    [659.25, 783.99, 987.77, 1318.5].forEach(function (f, i) {
+      var t = ctx.currentTime + i * 0.09;
+      var o = ctx.createOscillator(); o.type = "sine"; o.frequency.value = f;
+      var g = ctx.createGain();
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(0.2, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(t); o.stop(t + 0.55);
+    });
+  }
+
   // ---- interaction ----
   var raycaster = new THREE.Raycaster();
 
@@ -757,7 +808,8 @@
       for (var j = 0; j < current.strips.length; j++) {
         if (current.strips[j].mesh === hits[0].object) { strip = current.strips[j]; break; }
       }
-      drag = { mode: "peel", strip: strip, startX: p.px, startY: p.py, lastDist: 0 };
+      drag = { mode: "peel", strip: strip, startX: p.px, startY: p.py, lastDist: 0, nextRip: 0.06 };
+      ensureAudio(); // unlock audio on the first user gesture
       hint.style.opacity = "0";
       if (!started) { started = true; bananaStart = performance.now(); }
     } else {
@@ -777,6 +829,10 @@
       if (delta > 0) {
         var s = drag.strip;
         s.peelTarget = Math.min(1, s.peelTarget + delta / PEEL_RANGE_PX);
+        if (!s.peeled && s.peelTarget >= drag.nextRip && s.peelTarget < 1) {
+          playRip(s.peelTarget, false); // crackle as the peel tears open
+          drag.nextRip = s.peelTarget + 0.16;
+        }
         if (s.peelTarget >= 1 && !s.peeled) completeStrip(s);
       }
     } else {
@@ -806,13 +862,17 @@
 
   function completeStrip(s) {
     s.peeled = true;
+    playRip(1, true); // the final tear as the strip comes free
     var peeledStrips = current.strips.filter(function (st) { return st.peeled; }).length;
     progressFill.style.width = (peeledStrips / STRIP_COUNT * 100).toFixed(1) + "%";
     // first opened strip reveals what's inside — announce it
     if (peeledStrips === 1) {
-      showToast(current.rarity
-        ? current.rarity.label + " revealed!"
-        : REVEAL_MSGS[Math.random() * REVEAL_MSGS.length | 0]);
+      if (current.rarity) {
+        showToast(current.rarity.label + " revealed!");
+        playSparkle();
+      } else {
+        showToast(REVEAL_MSGS[Math.random() * REVEAL_MSGS.length | 0]);
+      }
     }
     checkComplete();
   }
