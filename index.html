@@ -375,24 +375,31 @@
     return t;
   }
 
-  // high-contrast studio gradient with a crisp horizon and bright spots, so
-  // polished metals show real hotspots and read as shiny minerals, not matte
+  // medal-style studio environment: alternating bright softbox stripes and dark
+  // gaps, so polished metal picks up streaky light/dark bands and reads lustrous
   function buildEnvironment() {
     var c = makeCanvas(512), x = c.getContext("2d");
     var g = x.createLinearGradient(0, 0, 0, 512);
-    g.addColorStop(0.0, "#ffffff"); g.addColorStop(0.34, "#efe6d0");
-    g.addColorStop(0.49, "#9a8a70"); g.addColorStop(0.5, "#2c251d"); // crisp horizon step
-    g.addColorStop(1.0, "#080706");
+    g.addColorStop(0.0, "#e8e2d4"); g.addColorStop(0.45, "#8d8272");
+    g.addColorStop(0.52, "#241f18"); g.addColorStop(1.0, "#060505");
     x.fillStyle = g; x.fillRect(0, 0, 512, 512);
-    function blob(cx, cy, r, a) {
-      var rg = x.createRadialGradient(cx, cy, 0, cx, cy, r);
-      rg.addColorStop(0, "rgba(255,255,255," + a + ")"); rg.addColorStop(1, "rgba(255,255,255,0)");
-      x.fillStyle = rg; x.beginPath(); x.arc(cx, cy, r, 0, 6.2832); x.fill();
+    // vertical softbox stripes at different azimuths; tilted slightly so the
+    // bands sweep diagonally across the fruit like the reflections on a medal
+    function stripe(cx, w, tilt, topA, botA) {
+      var grad = x.createLinearGradient(0, 0, 0, 512);
+      grad.addColorStop(0, "rgba(255,255,255," + topA + ")");
+      grad.addColorStop(0.55, "rgba(255,252,244," + botA + ")");
+      grad.addColorStop(1, "rgba(255,255,255,0)");
+      x.save(); x.translate(cx, 256); x.rotate(tilt); x.fillStyle = grad;
+      x.fillRect(-w / 2, -256, w, 512); x.restore();
     }
-    blob(150, 110, 70, 1.0);   // crisp key highlight
-    blob(150, 110, 150, 0.35); // its soft halo
-    blob(400, 80, 44, 1.0);    // crisp secondary
-    blob(300, 170, 90, 0.4);
+    stripe(90, 46, 0.12, 1.0, 0.5);    // key softbox
+    stripe(190, 18, -0.08, 0.95, 0.3); // thin crisp strip
+    stripe(300, 60, 0.1, 0.85, 0.35);
+    stripe(420, 26, -0.12, 1.0, 0.4);
+    // dark slats between, for the deep bands that make metal look liquid
+    x.fillStyle = "rgba(10,8,6,0.55)";
+    x.fillRect(140, 0, 26, 512); x.fillRect(250, 0, 24, 512); x.fillRect(370, 0, 24, 512);
     var tex = new THREE.CanvasTexture(c);
     tex.mapping = THREE.EquirectangularReflectionMapping;
     var pmrem = new THREE.PMREMGenerator(renderer);
@@ -487,16 +494,19 @@
   var NORMAL_CORE = { color: 0xf3e8c0, roughness: 0.62, metalness: 0.02, mapKind: "flesh" };
   var RARITIES = [
     { name: "golden", chance: 0.010, label: "✨ Golden Banana",
-      core: { color: 0xe8a30c, metalness: 1.0, roughness: 0.16, emissive: 0x5c3a00, emissiveIntensity: 0.22, envMapIntensity: 2.2 } },
+      core: { physical: true, color: 0xf7b510, metalness: 1.0, roughness: 0.09, clearcoat: 1.0, clearcoatRoughness: 0.08,
+        emissive: 0x4a2e00, emissiveIntensity: 0.14, envMapIntensity: 2.5 } },
     { name: "crystal", chance: 0.012, label: "💎 Crystal Banana", flat: true, pulse: true,
       core: { physical: true, color: 0x3fb8f2, metalness: 0.0, roughness: 0.06, transmission: 0.45, thickness: 1.3, ior: 1.9,
         clearcoat: 1.0, clearcoatRoughness: 0.05, emissive: 0x0a5cd6, emissiveIntensity: 0.65, envMapIntensity: 1.8 } },
     { name: "silver", chance: 0.020, label: "⚪ Silver Banana",
-      core: { color: 0x8e99a6, metalness: 1.0, roughness: 0.26, emissive: 0x0a0e14, emissiveIntensity: 0.15, envMapIntensity: 1.7 } },
+      core: { physical: true, color: 0xc4ccd4, metalness: 1.0, roughness: 0.09, clearcoat: 1.0, clearcoatRoughness: 0.08,
+        emissive: 0x0a0e14, emissiveIntensity: 0.1, envMapIntensity: 2.3 } },
     { name: "tnt", chance: 0.020, label: "🧨 TNT Banana", pulse: true,
       core: { color: 0xffffff, mapKind: "tnt", metalness: 0.1, roughness: 0.5, emissive: 0xff1e00, emissiveIntensity: 0.22, envMapIntensity: 0.6 } },
     { name: "bronze", chance: 0.035, label: "🟤 Bronze Banana",
-      core: { color: 0x9a5c22, metalness: 1.0, roughness: 0.24, emissive: 0x2e1503, emissiveIntensity: 0.14, envMapIntensity: 2.0 } },
+      core: { physical: true, color: 0xb06a2a, metalness: 1.0, roughness: 0.12, clearcoat: 0.9, clearcoatRoughness: 0.1,
+        emissive: 0x241002, emissiveIntensity: 0.1, envMapIntensity: 2.2 } },
     { name: "chocolate", chance: 0.055, label: "🍫 Chocolate Banana",
       core: { physical: true, color: 0x3a2214, metalness: 0.0, roughness: 0.26, clearcoat: 0.9, clearcoatRoughness: 0.18,
         emissive: 0x120a04, emissiveIntensity: 0.1, envMapIntensity: 1.0 } },
