@@ -484,10 +484,31 @@
     var t = canvasTex(c); t.repeat.set(3, 1); return t;
   }
 
+  // dark chocolate coating scattered with colorful candy sprinkles
+  function buildChocolateTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#38200f"; x.fillRect(0, 0, 256, 256);
+    var colors = ["#ff5f8f", "#ffd23f", "#4fd6ff", "#7bec6a", "#ff8c2e", "#f4f0ea", "#b98cff"];
+    for (var n = 0; n < 120; n++) {
+      x.save();
+      x.translate(Math.random() * 256, Math.random() * 256);
+      x.rotate(Math.random() * Math.PI);
+      x.fillStyle = colors[Math.random() * colors.length | 0];
+      var len = 7 + Math.random() * 5;
+      x.beginPath();
+      if (x.roundRect) x.roundRect(-len / 2, -1.6, len, 3.2, 1.6);
+      else x.rect(-len / 2, -1.6, len, 3.2);
+      x.fill();
+      x.restore();
+    }
+    return canvasTex(c);
+  }
+
   scene.environment = buildEnvironment();
   var TEX = {
     peel: buildPeelTexture(), flesh: buildFleshTexture(),
-    rotten: buildRottenTexture(), tnt: buildTNTTexture()
+    rotten: buildRottenTexture(), tnt: buildTNTTexture(),
+    chocolate: buildChocolateTexture()
   };
 
   // ---- rarity tiers: each banana rolls one; the inner fruit takes the material ----
@@ -508,7 +529,7 @@
       core: { physical: true, color: 0xa86428, metalness: 1.0, roughness: 0.28, clearcoat: 0.4, clearcoatRoughness: 0.28,
         emissive: 0x241002, emissiveIntensity: 0.12, envMapIntensity: 1.4 } },
     { name: "chocolate", chance: 0.055, label: "🍫 Chocolate Banana",
-      core: { physical: true, color: 0x3a2214, metalness: 0.0, roughness: 0.26, clearcoat: 0.9, clearcoatRoughness: 0.18,
+      core: { physical: true, color: 0xffffff, mapKind: "chocolate", metalness: 0.0, roughness: 0.3, clearcoat: 0.9, clearcoatRoughness: 0.18,
         emissive: 0x120a04, emissiveIntensity: 0.1, envMapIntensity: 1.0 } },
     { name: "rotten", chance: 0.075, label: "🤢 Rotten Banana",
       core: { color: 0xd8cb9e, metalness: 0.0, roughness: 0.92, emissive: 0x140e05, emissiveIntensity: 0.06, mapKind: "rotten" } }
@@ -682,7 +703,6 @@
   var current = createBanana(pickRarity());
   current.setScale(0);
   scene.add(current.group);
-  if (current.rarity) showToast(current.rarity.label + "!");
 
   var state = "entering";   // entering | playing | exiting
   var stateT = 0;
@@ -779,10 +799,21 @@
     drag = null;
   }
 
+  var REVEAL_MSGS = [
+    "Just a banana 🍌", "Fresh and ripe! 🍌", "Plain old banana 🍌",
+    "Nothing rare this time 🍌", "Classic yellow 🍌"
+  ];
+
   function completeStrip(s) {
     s.peeled = true;
     var peeledStrips = current.strips.filter(function (st) { return st.peeled; }).length;
     progressFill.style.width = (peeledStrips / STRIP_COUNT * 100).toFixed(1) + "%";
+    // first opened strip reveals what's inside — announce it
+    if (peeledStrips === 1) {
+      showToast(current.rarity
+        ? current.rarity.label + " revealed!"
+        : REVEAL_MSGS[Math.random() * REVEAL_MSGS.length | 0]);
+    }
     checkComplete();
   }
 
@@ -824,7 +855,6 @@
     bananaElapsed = 0;
     timerEl.textContent = "0.0s";
     progressFill.style.width = "0%";
-    if (current.rarity) showToast(current.rarity.label + "!");
   }
 
   // ---- UI helpers ----
