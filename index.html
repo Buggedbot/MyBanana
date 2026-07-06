@@ -40,28 +40,120 @@
     align-items: center;
     box-sizing: border-box;
   }
+  header { flex-wrap: wrap; row-gap: 6px; }
   header h1 {
-    font-size: 1.18rem;
+    font-size: 1.05rem;
     margin: 0;
     letter-spacing: 0.4px;
     text-shadow: 0 2px 10px rgba(0,0,0,0.4);
   }
   .stats {
     display: flex;
-    gap: 8px;
+    gap: 6px;
+    flex-wrap: wrap;
   }
   .pill {
-    font-size: 0.82rem;
+    font-size: 0.78rem;
     font-weight: 600;
-    padding: 5px 11px;
+    padding: 5px 10px;
     border-radius: 999px;
     background: rgba(255,255,255,0.08);
     border: 1px solid rgba(255,255,255,0.07);
     backdrop-filter: blur(4px);
     white-space: nowrap;
     transition: transform 0.18s ease, background 0.18s ease;
+    color: #fff;
+    font-family: inherit;
   }
   .pill.bump { transform: scale(1.18); background: rgba(255,210,63,0.22); }
+  button.pill { cursor: pointer; }
+  .float-pt {
+    position: absolute;
+    z-index: 11;
+    font-weight: 800;
+    font-size: 1.05rem;
+    color: #ffd23f;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+    pointer-events: none;
+    animation: floatUp 0.9s ease-out forwards;
+  }
+  @keyframes floatUp {
+    0%   { opacity: 0; transform: translate(-50%, 0) scale(0.8); }
+    15%  { opacity: 1; transform: translate(-50%, -14px) scale(1.15); }
+    100% { opacity: 0; transform: translate(-50%, -64px) scale(1); }
+  }
+  #combo {
+    position: absolute;
+    z-index: 11;
+    top: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-weight: 900;
+    font-size: 1.4rem;
+    color: #ff9a3d;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.55);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  #combo.on { opacity: 1; }
+  #combo.pop { animation: comboPop 0.3s ease; }
+  @keyframes comboPop {
+    0%   { transform: translateX(-50%) scale(1); }
+    40%  { transform: translateX(-50%) scale(1.35); }
+    100% { transform: translateX(-50%) scale(1); }
+  }
+  #stage-wrap.shake #stage { animation: shake 0.45s ease; }
+  @keyframes shake {
+    0%, 100% { transform: translate(0, 0); }
+    20% { transform: translate(-8px, 5px); }
+    40% { transform: translate(7px, -6px); }
+    60% { transform: translate(-6px, -4px); }
+    80% { transform: translate(5px, 3px); }
+  }
+  #collection {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    background: rgba(8,6,4,0.72);
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+  #collection.open { display: flex; }
+  .col-card {
+    background: #1c1712;
+    border: 1px solid rgba(255,210,63,0.25);
+    border-radius: 16px;
+    padding: 18px 20px;
+    width: min(86vw, 360px);
+    max-height: 78vh;
+    overflow-y: auto;
+    box-shadow: 0 18px 50px rgba(0,0,0,0.6);
+  }
+  .col-card h2 { margin: 0 0 10px; font-size: 1.05rem; display: flex; justify-content: space-between; }
+  .col-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 4px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    font-size: 0.92rem;
+  }
+  .col-row.locked { opacity: 0.45; }
+  .col-count { opacity: 0.75; }
+  #col-close {
+    margin-top: 14px;
+    width: 100%;
+    padding: 11px;
+    border-radius: 10px;
+    border: 0;
+    background: #ffd23f;
+    color: #231a05;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+  }
   #stage-wrap {
     position: relative;
     flex: 1;
@@ -173,17 +265,27 @@
     <h1>🍌 Peel the Banana</h1>
     <div class="stats">
       <span class="pill" id="timer">0.0s</span>
+      <span class="pill" id="score">⭐ 0</span>
       <span class="pill" id="count">🍌 0</span>
       <span class="pill" id="best">⚡ --</span>
+      <button class="pill" id="collect-btn">📖</button>
     </div>
   </header>
   <div id="stage-wrap">
     <div id="hint">Drag a peel to open it · drag the background to spin</div>
     <canvas id="stage"></canvas>
     <div id="toast"></div>
+    <div id="combo"></div>
     <div id="progress-bar"><div id="progress-fill"></div></div>
   </div>
-  <footer>Peel all 4 strips — a fresh banana appears each time</footer>
+  <footer>Peel fast to chain combos · collect all 7 rare bananas</footer>
+  <div id="collection">
+    <div class="col-card">
+      <h2>📖 Collection <span id="col-progress"></span></h2>
+      <div id="col-list"></div>
+      <button id="col-close">Keep peeling</button>
+    </div>
+  </div>
 </div>
 <script src="vendor/three.min.js"></script>
 <script>
@@ -195,9 +297,16 @@
   var timerEl = document.getElementById("timer");
   var countEl = document.getElementById("count");
   var bestEl = document.getElementById("best");
+  var scoreEl = document.getElementById("score");
+  var comboEl = document.getElementById("combo");
   var progressFill = document.getElementById("progress-fill");
   var toastEl = document.getElementById("toast");
   var hint = document.getElementById("hint");
+  var collectBtn = document.getElementById("collect-btn");
+  var collectionEl = document.getElementById("collection");
+  var colListEl = document.getElementById("col-list");
+  var colProgressEl = document.getElementById("col-progress");
+  var colCloseEl = document.getElementById("col-close");
 
   var STRIP_COUNT = 4;
   var LENGTH = 3.6;
@@ -514,24 +623,24 @@
   // ---- rarity tiers: each banana rolls one; the inner fruit takes the material ----
   var NORMAL_CORE = { color: 0xf3e8c0, roughness: 0.62, metalness: 0.02, mapKind: "flesh" };
   var RARITIES = [
-    { name: "golden", label: "✨ Golden Banana",
+    { name: "golden", mult: 10, label: "✨ Golden Banana",
       core: { physical: true, color: 0xf0ad10, metalness: 1.0, roughness: 0.24, clearcoat: 0.5, clearcoatRoughness: 0.25,
         emissive: 0x4a2e00, emissiveIntensity: 0.16, envMapIntensity: 1.5 } },
-    { name: "crystal", label: "💎 Crystal Banana", flat: true, pulse: true,
+    { name: "crystal", mult: 8, label: "💎 Crystal Banana", flat: true, pulse: true,
       core: { physical: true, color: 0x3fb8f2, metalness: 0.0, roughness: 0.06, transmission: 0.45, thickness: 1.3, ior: 1.9,
         clearcoat: 1.0, clearcoatRoughness: 0.05, emissive: 0x0a5cd6, emissiveIntensity: 0.65, envMapIntensity: 1.8 } },
-    { name: "silver", label: "⚪ Silver Banana",
+    { name: "silver", mult: 6, label: "⚪ Silver Banana",
       core: { physical: true, color: 0xb2bac4, metalness: 1.0, roughness: 0.24, clearcoat: 0.5, clearcoatRoughness: 0.25,
         emissive: 0x0a0e14, emissiveIntensity: 0.12, envMapIntensity: 1.4 } },
-    { name: "tnt", label: "🧨 TNT Banana", pulse: true,
+    { name: "tnt", mult: 5, label: "🧨 TNT Banana", pulse: true,
       core: { color: 0xffffff, mapKind: "tnt", metalness: 0.1, roughness: 0.5, emissive: 0xff1e00, emissiveIntensity: 0.22, envMapIntensity: 0.6 } },
-    { name: "bronze", label: "🟤 Bronze Banana",
+    { name: "bronze", mult: 4, label: "🟤 Bronze Banana",
       core: { physical: true, color: 0xa86428, metalness: 1.0, roughness: 0.28, clearcoat: 0.4, clearcoatRoughness: 0.28,
         emissive: 0x241002, emissiveIntensity: 0.12, envMapIntensity: 1.4 } },
-    { name: "chocolate", label: "🍫 Chocolate Banana",
+    { name: "chocolate", mult: 3, label: "🍫 Chocolate Banana",
       core: { physical: true, color: 0xffffff, mapKind: "chocolate", metalness: 0.0, roughness: 0.3, clearcoat: 0.9, clearcoatRoughness: 0.18,
         emissive: 0x120a04, emissiveIntensity: 0.1, envMapIntensity: 1.0 } },
-    { name: "rotten", label: "🤢 Rotten Banana",
+    { name: "rotten", mult: 2, label: "🤢 Rotten Banana",
       core: { color: 0xd8cb9e, metalness: 0.0, roughness: 0.92, emissive: 0x140e05, emissiveIntensity: 0.06, mapKind: "rotten" } }
   ];
   // 50/50: half of all bananas are rare, split evenly across the tiers
@@ -713,15 +822,31 @@
   var bananaStart = 0;
   var bananaElapsed = 0;
   var peeledCount = 0;
+  var totalScore = 0;
+  var collection = {};      // rarity name -> times found
+  var combo = 0;            // consecutive strips within the combo window
+  var lastStripAt = -Infinity;
+  var COMBO_WINDOW = 4000;  // ms between strips to keep the chain alive
   var drag = null;
 
   var best = null;
   try {
     var saved = localStorage.getItem("banana_best_time");
     if (saved) best = parseFloat(saved);
+    peeledCount = parseInt(localStorage.getItem("banana_count"), 10) || 0;
+    totalScore = parseInt(localStorage.getItem("banana_score"), 10) || 0;
+    collection = JSON.parse(localStorage.getItem("banana_collection") || "{}") || {};
   } catch (e) {}
+  function saveProgress() {
+    try {
+      localStorage.setItem("banana_count", String(peeledCount));
+      localStorage.setItem("banana_score", String(totalScore));
+      localStorage.setItem("banana_collection", JSON.stringify(collection));
+    } catch (e) {}
+  }
   updateBest();
   updateCount();
+  updateScore();
 
   // ---- easing ----
   function easeOutBack(x) {
@@ -779,6 +904,29 @@
       o.start(t); o.stop(t + 0.55);
     });
   }
+  // deep thump + muffled noise for the TNT banana going off
+  function playBoom() {
+    var ctx = ensureAudio(); if (!ctx) return;
+    var t = ctx.currentTime;
+    var o = ctx.createOscillator(); o.type = "sine";
+    o.frequency.setValueAtTime(160, t);
+    o.frequency.exponentialRampToValueAtTime(36, t + 0.5);
+    var g = ctx.createGain();
+    g.gain.setValueAtTime(0.7, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.6);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(t); o.stop(t + 0.65);
+    var src = ctx.createBufferSource(); src.buffer = getNoise(ctx);
+    var lp = ctx.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 420;
+    var g2 = ctx.createGain();
+    g2.gain.setValueAtTime(0.5, t);
+    g2.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
+    src.connect(lp); lp.connect(g2); g2.connect(ctx.destination);
+    src.start(t); src.stop(t + 0.5);
+  }
+  function buzz(pattern) {
+    try { if (navigator.vibrate) navigator.vibrate(pattern); } catch (e) {}
+  }
 
   // ---- interaction ----
   var raycaster = new THREE.Raycaster();
@@ -822,6 +970,7 @@
     if (!drag || state !== "playing") return;
     var p = pointerInfo(evt);
     if (drag.mode === "peel") {
+      drag.lastPX = p.px; drag.lastPY = p.py;
       var dx = p.px - drag.startX, dy = p.py - drag.startY;
       var dist = Math.sqrt(dx * dx + dy * dy);
       var delta = dist - drag.lastDist;
@@ -860,16 +1009,64 @@
     "Nothing rare this time 🍌", "Classic yellow 🍌"
   ];
 
+  // floating "+N" popup at a stage-relative position
+  function floatPoint(text, relX, relY) {
+    var el = document.createElement("div");
+    el.className = "float-pt";
+    el.textContent = text;
+    el.style.left = relX + "px";
+    el.style.top = relY + "px";
+    stageWrap.appendChild(el);
+    setTimeout(function () { el.remove(); }, 950);
+  }
+  function pointerToStage(px, py) {
+    var rect = stageWrap.getBoundingClientRect();
+    return { x: px - rect.left, y: py - rect.top };
+  }
+
+  function addScore(pts) {
+    totalScore += pts;
+    updateScore();
+    bump(scoreEl);
+    saveProgress();
+  }
+
   function completeStrip(s) {
     s.peeled = true;
     playRip(1, true); // the final tear as the strip comes free
+    buzz(18);
+
+    // combo chain: strips torn within the window multiply the points
+    var nowMs = performance.now();
+    combo = (nowMs - lastStripAt <= COMBO_WINDOW) ? combo + 1 : 1;
+    lastStripAt = nowMs;
+    var mult = Math.min(combo, 8);
+    var pts = 10 * mult;
+    addScore(pts);
+    var at = drag ? pointerToStage(drag.lastPX || drag.startX, (drag.lastPY || drag.startY) - 24)
+                  : { x: stageWrap.clientWidth / 2, y: stageWrap.clientHeight * 0.4 };
+    floatPoint("+" + pts, at.x, at.y);
+    if (mult >= 2) {
+      comboEl.textContent = "×" + mult + " COMBO";
+      comboEl.classList.add("on");
+      comboEl.classList.remove("pop");
+      void comboEl.offsetWidth;
+      comboEl.classList.add("pop");
+    }
+
     var peeledStrips = current.strips.filter(function (st) { return st.peeled; }).length;
     progressFill.style.width = (peeledStrips / STRIP_COUNT * 100).toFixed(1) + "%";
     // first opened strip reveals what's inside — announce it
     if (peeledStrips === 1) {
       if (current.rarity) {
-        showToast(current.rarity.label + " revealed!");
+        var r = current.rarity;
+        var isNew = !collection[r.name];
+        collection[r.name] = (collection[r.name] || 0) + 1;
+        saveProgress();
+        renderCollection();
+        showToast(isNew ? "NEW! " + r.label + " ✨" : r.label + " revealed!");
         playSparkle();
+        buzz([25, 40, 55]);
       } else {
         showToast(REVEAL_MSGS[Math.random() * REVEAL_MSGS.length | 0]);
       }
@@ -886,6 +1083,15 @@
       bananaElapsed = (performance.now() - bananaStart) / 1000;
       updateCount();
       bump(countEl);
+
+      // completion bonus scaled by rarity, plus a speed bonus for quick peels
+      var isTNT = current.rarity && current.rarity.name === "tnt";
+      var bonus = 50 * (current.rarity ? current.rarity.mult : 1);
+      var speedBonus = (started && bananaElapsed < 6) ? 100 : 0;
+      addScore(bonus + speedBonus);
+      floatPoint("+" + (bonus + speedBonus) + (speedBonus ? " ⚡" : ""),
+        stageWrap.clientWidth / 2, stageWrap.clientHeight * 0.3);
+
       var tag = current.rarity ? current.rarity.label + " — " : "";
       var msg;
       if (started && (best === null || bananaElapsed < best)) {
@@ -898,7 +1104,20 @@
         msg = tag + "Peeled! " + bananaElapsed.toFixed(1) + "s ✨";
       }
       showToast(msg);
+      saveProgress();
+
+      pMat.color.setHex(isTNT ? 0xff5030 : 0xffd23f);
       burst(current.group.localToWorld(new THREE.Vector3(0, 0, 0)));
+      if (isTNT) {
+        playBoom();
+        buzz([60, 50, 120]);
+        stageWrap.classList.remove("shake");
+        void stageWrap.offsetWidth;
+        stageWrap.classList.add("shake");
+        setTimeout(function () { stageWrap.classList.remove("shake"); }, 500);
+      } else {
+        buzz([30, 40, 60]);
+      }
       // let the strips finish swinging, then drop the banana away
       setTimeout(function () { if (state === "playing") { state = "exiting"; stateT = 0; } }, 360);
     }
@@ -932,6 +1151,34 @@
   }
   function updateBest() { bestEl.textContent = "⚡ " + (best !== null ? best.toFixed(1) + "s" : "--"); }
   function updateCount() { countEl.textContent = "🍌 " + peeledCount; }
+  function updateScore() { scoreEl.textContent = "⭐ " + totalScore.toLocaleString(); }
+
+  // ---- collection book ----
+  function renderCollection() {
+    var found = 0;
+    colListEl.innerHTML = "";
+    RARITIES.forEach(function (r) {
+      var n = collection[r.name] || 0;
+      if (n) found++;
+      var row = document.createElement("div");
+      row.className = "col-row" + (n ? "" : " locked");
+      var name = document.createElement("span");
+      name.textContent = n ? r.label : "❓ ???";
+      var count = document.createElement("span");
+      count.className = "col-count";
+      count.textContent = n ? "×" + n : "not found";
+      row.appendChild(name); row.appendChild(count);
+      colListEl.appendChild(row);
+    });
+    colProgressEl.textContent = found + "/" + RARITIES.length;
+    collectBtn.textContent = "📖 " + found + "/" + RARITIES.length;
+  }
+  collectBtn.addEventListener("click", function () { collectionEl.classList.add("open"); });
+  colCloseEl.addEventListener("click", function () { collectionEl.classList.remove("open"); });
+  collectionEl.addEventListener("click", function (e) {
+    if (e.target === collectionEl) collectionEl.classList.remove("open");
+  });
+  renderCollection();
 
   // ---- input wiring ----
   canvas.addEventListener("mousedown", onPointerDown);
@@ -1027,6 +1274,12 @@
     if (current.rarity && current.rarity.pulse) {
       var base = current.rarity.core.emissiveIntensity || 0;
       current.coreMat.emissiveIntensity = base + base * 1.2 * (0.5 + 0.5 * Math.sin(now * 0.008));
+    }
+
+    // combo chain expires if the next strip doesn't come in time
+    if (combo > 0 && performance.now() - lastStripAt > COMBO_WINDOW) {
+      combo = 0;
+      comboEl.classList.remove("on");
     }
 
     if (state === "playing") {
