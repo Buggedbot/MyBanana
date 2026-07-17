@@ -867,6 +867,15 @@
   var RARE_TOTAL = 0.5;
   var TOTAL_WEIGHT = RARITIES.reduce(function (sum, r) { return sum + r.weight; }, 0);
   RARITIES.forEach(function (r) { r.chance = RARE_TOTAL * r.weight / TOTAL_WEIGHT; });
+  // debris color for each tier's completion burst (default gold for normals)
+  var BURST_COLORS = {
+    diamond: 0xbfe8ff, golden: 0xffd23f, galaxy: 0x9a6cff, rainbow: 0xff66cc,
+    crystal: 0x54c8ff, lava: 0xff5a20, silver: 0xdde4ea, vampire: 0xc4001f,
+    tnt: 0xff5030, toxic: 0x8dff2a, bronze: 0xcd7f32, frozen: 0xcfeeff,
+    chocolate: 0x8a5a30, zombie: 0x9dff4a, rotten: 0x8a7a30, candy: 0xff8fc0,
+    wooden: 0xa87840
+  };
+  RARITIES.forEach(function (r) { r.burstColor = BURST_COLORS[r.name]; });
   function pickRarity() {
     var r = Math.random(), acc = 0;
     for (var i = 0; i < RARITIES.length; i++) {
@@ -1235,6 +1244,41 @@
     src.connect(lp); lp.connect(g2); g2.connect(ctx.destination);
     src.start(t); src.stop(t + 0.5);
   }
+  // bright glassy crack for the frozen banana shattering open
+  function playShatter() {
+    var ctx = ensureAudio(); if (!ctx) return;
+    var t = ctx.currentTime;
+    var src = ctx.createBufferSource(); src.buffer = getNoise(ctx);
+    var hp = ctx.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 2600;
+    var g = ctx.createGain();
+    g.gain.setValueAtTime(0.5, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+    src.connect(hp); hp.connect(g); g.connect(ctx.destination);
+    src.start(t); src.stop(t + 0.4);
+    [2093, 2637, 3136].forEach(function (f, i) {
+      var o = ctx.createOscillator(); o.type = "sine"; o.frequency.value = f;
+      var og = ctx.createGain();
+      var ot = t + i * 0.04;
+      og.gain.setValueAtTime(0.12, ot);
+      og.gain.exponentialRampToValueAtTime(0.001, ot + 0.25);
+      o.connect(og); og.connect(ctx.destination);
+      o.start(ot); o.stop(ot + 0.3);
+    });
+  }
+  // sad descending "womp" for the rotten banana
+  function playWomp() {
+    var ctx = ensureAudio(); if (!ctx) return;
+    var t = ctx.currentTime;
+    var o = ctx.createOscillator(); o.type = "sawtooth";
+    o.frequency.setValueAtTime(220, t);
+    o.frequency.exponentialRampToValueAtTime(70, t + 0.5);
+    var lp = ctx.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 700;
+    var g = ctx.createGain();
+    g.gain.setValueAtTime(0.25, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.55);
+    o.connect(lp); lp.connect(g); g.connect(ctx.destination);
+    o.start(t); o.stop(t + 0.6);
+  }
   function buzz(pattern) {
     try { if (navigator.vibrate) navigator.vibrate(pattern); } catch (e) {}
   }
@@ -1417,9 +1461,10 @@
       showToast(msg);
       saveProgress();
 
-      pMat.color.setHex(isTNT ? 0xff5030 : 0xffd23f);
+      var rname = current.rarity ? current.rarity.name : null;
+      pMat.color.setHex((current.rarity && current.rarity.burstColor) || 0xffd23f);
       var burstCenter = current.group.localToWorld(new THREE.Vector3(0, 0, 0));
-      burst(burstCenter, isTNT);
+      burst(burstCenter, isTNT || rname === "golden" || rname === "diamond");
       if (isTNT) {
         playBoom();
         buzz([60, 50, 120]);
@@ -1432,6 +1477,9 @@
         stageWrap.classList.add("shake");
         setTimeout(function () { stageWrap.classList.remove("shake"); }, 500);
       } else {
+        if (rname === "frozen" || rname === "crystal" || rname === "diamond") playShatter();
+        else if (rname === "rotten") playWomp();
+        else if (rname === "golden") playSparkle();
         buzz([30, 40, 60]);
       }
       // let the strips finish swinging, then drop the banana away
