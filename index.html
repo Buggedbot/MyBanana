@@ -175,6 +175,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    --glow-rgb: 255,213,80; /* retinted to the rarity color once revealed */
   }
   /* soft glow behind the banana */
   #stage-wrap::before {
@@ -183,10 +184,26 @@
     width: 62%;
     height: 56%;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(255,213,80,0.20), rgba(255,213,80,0) 70%);
+    background: radial-gradient(circle, rgba(var(--glow-rgb),0.22), rgba(var(--glow-rgb),0) 70%);
     filter: blur(8px);
     pointer-events: none;
     animation: breathe 5s ease-in-out infinite;
+    transition: background 0.5s ease;
+  }
+  .zest {
+    position: absolute;
+    z-index: 9;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #ffe25a;
+    box-shadow: 0 0 6px rgba(255,213,80,0.8);
+    pointer-events: none;
+    animation: zestFly 0.5s ease-out forwards;
+  }
+  @keyframes zestFly {
+    0%   { opacity: 1; transform: translate(0, 0) scale(1); }
+    100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.3); }
   }
   @keyframes breathe {
     0%, 100% { opacity: 0.7; transform: scale(1); }
@@ -972,6 +989,9 @@
 
       var radial = rf.N.clone().multiplyScalar(Math.cos(thetaC)).addScaledVector(rf.B, Math.sin(thetaC));
       var axis = rf.T.clone().cross(radial).normalize();
+      // tilt the hinge a touch around the trunk so this strip falls slightly
+      // askew rather than perfectly radially — no two peels drop the same way
+      axis.applyAxisAngle(rf.T, (Math.random() - 0.5) * 0.4).normalize();
 
       // spine point per lengthwise row, in the strip's local (root-relative) space
       var spine = [];
@@ -982,6 +1002,10 @@
       strips.push({
         mesh: mesh, hinge: hinge, axis: axis, spine: spine,
         peel: 0, peelTarget: 0, peeled: false,
+        // per-strip droop personality: fold depth, curl tightness, ramp speed
+        foldAngle: PEEL_FOLD * (0.85 + Math.random() * 0.35),
+        curlAngle: PEEL_CURL * (0.55 + Math.random() * 0.95),
+        foldRamp: 0.22 + Math.random() * 0.18,
         basePos: geo.attributes.position.array.slice(0), lastPeel: -1
       });
     }
@@ -1311,8 +1335,9 @@
       for (var j = 0; j < current.strips.length; j++) {
         if (current.strips[j].mesh === hits[0].object) { strip = current.strips[j]; break; }
       }
-      drag = { mode: "peel", strip: strip, startX: p.px, startY: p.py, lastDist: 0, nextRip: 0.06 };
+      drag = { mode: "peel", strip: strip, startX: p.px, startY: p.py, lastDist: 0, nextRip: 0.06, nextZest: 30 };
       ensureAudio(); // unlock audio on the first user gesture
+      kickWobble(0.5); // the fruit jiggles when you grab a peel
       hint.style.opacity = "0";
       if (!started) { started = true; bananaStart = performance.now(); }
     } else {
@@ -1336,6 +1361,10 @@
         if (!s.peeled && s.peelTarget >= drag.nextRip && s.peelTarget < 1) {
           playRip(s.peelTarget, false); // crackle as the peel tears open
           drag.nextRip = s.peelTarget + 0.16;
+        }
+        if (!s.peeled && dist >= drag.nextZest) {
+          zestSpray(p.px, p.py); // flecks spray from under the finger
+          drag.nextZest = dist + 34;
         }
         if (s.peelTarget >= 1 && !s.peeled) completeStrip(s);
       }
@@ -1379,6 +1408,28 @@
     return { x: px - rect.left, y: py - rect.top };
   }
 
+  // tiny zest flecks spraying from under the finger while a peel tears
+  function zestSpray(px, py) {
+    var at = pointerToStage(px, py);
+    for (var i = 0; i < 3; i++) {
+      var el = document.createElement("div");
+      el.className = "zest";
+      el.style.left = at.x + "px";
+      el.style.top = at.y + "px";
+      var ang = Math.random() * Math.PI * 2, dist = 26 + Math.random() * 34;
+      el.style.setProperty("--dx", (Math.cos(ang) * dist).toFixed(0) + "px");
+      el.style.setProperty("--dy", (Math.sin(ang) * dist - 22).toFixed(0) + "px");
+      stageWrap.appendChild(el);
+      setTimeout(function (n) { n.remove(); }.bind(null, el), 520);
+    }
+  }
+
+  // jelly squash-and-wobble on the whole banana (grabs, tears)
+  var wobbleAmp = 0, wobbleT = 0;
+  function kickWobble(amp) { wobbleAmp = Math.min(1.3, wobbleAmp + amp); wobbleT = 0; }
+
+  function hexToRgbStr(h) { return ((h >> 16) & 255) + "," + ((h >> 8) & 255) + "," + (h & 255); }
+
   function addScore(pts) {
     totalScore += pts;
     updateScore();
@@ -1390,6 +1441,7 @@
     s.peeled = true;
     playRip(1, true); // the final tear as the strip comes free
     buzz(18);
+    kickWobble(0.9); // satisfying jelly snap as the strip comes free
 
     // combo chain: strips torn within the window multiply the points
     var nowMs = performance.now();
@@ -1422,6 +1474,8 @@
         showToast(isNew ? "NEW! " + r.label + " ✨" : r.label + " revealed!");
         playSparkle();
         buzz([25, 40, 55]);
+        // the breathing glow behind the fruit takes on the tier's color
+        if (r.burstColor) stageWrap.style.setProperty("--glow-rgb", hexToRgbStr(r.burstColor));
       } else {
         showToast(REVEAL_MSGS[Math.random() * REVEAL_MSGS.length | 0]);
       }
@@ -1499,6 +1553,8 @@
     timerEl.textContent = "0.0s";
     progressFill.style.width = "0%";
     for (var i = 0; i < AMB_COUNT; i++) ambLife[i] = 0; // force-respawn for the new tier's effect
+    stageWrap.style.removeProperty("--glow-rgb");      // back to the default warm glow
+    wobbleAmp = 0;
   }
 
   // ---- UI helpers ----
@@ -1575,10 +1631,10 @@
   }
 
   // cumulative bend angle at lengthwise fraction t: a quick fold near the root
-  // plus curl accumulating toward the tip
-  function bendAngleAt(peel, t) {
-    var fold = 1 - Math.pow(1 - Math.min(t / 0.3, 1), 2); // rises fast, 1 by t=0.3
-    return peel * (PEEL_FOLD * fold + PEEL_CURL * t * t);
+  // plus curl accumulating toward the tip, using this strip's own droop numbers
+  function bendAngleAt(s, t) {
+    var fold = 1 - Math.pow(1 - Math.min(t / s.foldRamp, 1), 2); // rises fast near the root
+    return s.peel * (s.foldAngle * fold + s.curlAngle * t * t);
   }
 
   // bend the strip by chaining each spine segment onto the previous one: every
@@ -1599,11 +1655,11 @@
 
     var accQ = _accQ.identity();
     var newSpine = _newSpine.copy(spine[0]); // row 0 stays anchored at the hinge
-    var prevAngle = bendAngleAt(s.peel, 0);
+    var prevAngle = bendAngleAt(s, 0);
 
     for (var row = 0; row <= STRIP_SAMPLES; row++) {
       if (row > 0) {
-        var a = bendAngleAt(s.peel, row / STRIP_SAMPLES);
+        var a = bendAngleAt(s, row / STRIP_SAMPLES);
         _stepQ.setFromAxisAngle(s.axis, a - prevAngle);
         accQ.multiply(_stepQ);           // accumulate this segment's extra turn
         prevAngle = a;
@@ -1652,12 +1708,12 @@
         current.coreMat.emissiveIntensity += base * 3.5 * flick;
       }
     }
-    // rainbow banana cycles through the color wheel and breathes gently
+    // rainbow banana cycles through the color wheel (its gentle breathing is
+    // folded into the shared playing-state scale below)
     if (current.rarity && current.rarity.hueShift) {
       var hue = (now * 0.00012) % 1;
       current.coreMat.color.setHSL(hue, 0.65, 0.55);
       current.coreMat.emissive.setHSL((hue + 0.5) % 1, 0.85, 0.4);
-      if (state === "playing") g.scale.setScalar(1 + 0.035 * Math.sin(now * 0.0032));
     }
     // lava crawls, toxic ooze bubbles up, candy stripes spin, galaxy drifts
     if (current.rarity && current.rarity.flow) {
@@ -1683,6 +1739,13 @@
       if (!drag) g.rotation.y += AUTO_SPIN * dt;           // gentle idle spin
       g.position.y = BASE_Y + Math.sin(now * 0.0018) * BOB_AMP;
       g.position.x = 0;
+      // jelly wobble (squash one axis, stretch the others) on grabs and tears,
+      // layered over rainbow's slow breathing
+      wobbleT += dt;
+      wobbleAmp *= Math.exp(-5 * dt);
+      var breathe = (current.rarity && current.rarity.hueShift) ? 1 + 0.035 * Math.sin(now * 0.0032) : 1;
+      var w = wobbleAmp * Math.sin(wobbleT * 16);
+      g.scale.set(breathe * (1 + 0.05 * w), breathe * (1 - 0.07 * w), breathe * (1 + 0.05 * w));
       if (started) {
         bananaElapsed = (now - bananaStart) / 1000;
         timerEl.textContent = bananaElapsed.toFixed(1) + "s";
