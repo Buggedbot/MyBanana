@@ -989,9 +989,9 @@
 
       var radial = rf.N.clone().multiplyScalar(Math.cos(thetaC)).addScaledVector(rf.B, Math.sin(thetaC));
       var axis = rf.T.clone().cross(radial).normalize();
-      // tilt the hinge a touch around the trunk so this strip falls slightly
-      // askew rather than perfectly radially — no two peels drop the same way
-      axis.applyAxisAngle(rf.T, (Math.random() - 0.5) * 0.4).normalize();
+      // tilt the hinge around the trunk so this strip falls askew rather than
+      // perfectly radially — no two peels drop the same way
+      axis.applyAxisAngle(rf.T, (Math.random() - 0.5) * 0.7).normalize();
 
       // spine point per lengthwise row, in the strip's local (root-relative) space
       var spine = [];
@@ -999,12 +999,27 @@
         spine.push(centerline(si / STRIP_SAMPLES).sub(root));
       }
 
+      // each strip rolls one of four distinct peel styles, so the finished
+      // banana's silhouette is different every time
+      var styleRoll = Math.random(), foldAngle, curlAngle;
+      if (styleRoll < 0.3) {         // tight curler: the tip rolls into a spiral
+        foldAngle = PEEL_FOLD * (0.6 + Math.random() * 0.3);
+        curlAngle = PEEL_CURL * (1.8 + Math.random() * 1.4);
+      } else if (styleRoll < 0.55) { // flare: barely curls, juts out like a star petal
+        foldAngle = PEEL_FOLD * (0.55 + Math.random() * 0.25);
+        curlAngle = PEEL_CURL * (0.15 + Math.random() * 0.3);
+      } else if (styleRoll < 0.8) {  // classic droop
+        foldAngle = PEEL_FOLD * (0.9 + Math.random() * 0.3);
+        curlAngle = PEEL_CURL * (0.6 + Math.random() * 0.6);
+      } else {                       // hang-down: folds far and hugs the trunk
+        foldAngle = PEEL_FOLD * (1.15 + Math.random() * 0.25);
+        curlAngle = PEEL_CURL * (0.5 + Math.random() * 0.5);
+      }
+
       strips.push({
         mesh: mesh, hinge: hinge, axis: axis, spine: spine,
         peel: 0, peelTarget: 0, peeled: false,
-        // per-strip droop personality: fold depth, curl tightness, ramp speed
-        foldAngle: PEEL_FOLD * (0.85 + Math.random() * 0.35),
-        curlAngle: PEEL_CURL * (0.55 + Math.random() * 0.95),
+        foldAngle: foldAngle, curlAngle: curlAngle,
         foldRamp: 0.22 + Math.random() * 0.18,
         basePos: geo.attributes.position.array.slice(0), lastPeel: -1
       });
