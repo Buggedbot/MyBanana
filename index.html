@@ -64,7 +64,14 @@
     transition: transform 0.18s ease, background 0.18s ease;
     color: #fff;
     font-family: inherit;
+    font-variant-numeric: tabular-nums; /* digits all the same width — no jitter */
+    text-align: center;
   }
+  /* fixed minimum widths so growing numbers never reflow (and flicker) the header */
+  #timer { min-width: 64px; }
+  #score { min-width: 82px; }
+  #count { min-width: 58px; }
+  #best  { min-width: 66px; }
   .pill.bump { transform: scale(1.18); background: rgba(255,210,63,0.22); }
   button.pill { cursor: pointer; }
   .float-pt {
@@ -1873,7 +1880,7 @@
     var nowMs = performance.now();
     combo = (nowMs - lastStripAt <= COMBO_WINDOW) ? combo + 1 : 1;
     lastStripAt = nowMs;
-    var mult = Math.min(combo, 8);
+    var mult = combo; // no cap — chains can climb as high as you can peel
     var pts = 10 * mult;
     addScore(pts);
     var at = drag ? pointerToStage(drag.lastPX || drag.startX, (drag.lastPY || drag.startY) - 24)
@@ -1986,8 +1993,9 @@
         else if (rname === "golden" || rname === "royal" || rname === "trophy" || rname === "mystic" || rname === "matryoshka") playSparkle();
         buzz([30, 40, 60]);
       }
-      // let the strips finish swinging, then drop the banana away
-      setTimeout(function () { if (state === "playing") { state = "exiting"; stateT = 0; } }, 360);
+      // let the strips finish swinging, then drop the banana away (whatever
+      // state we're in — a completed banana must always leave)
+      setTimeout(function () { if (state !== "exiting") { state = "exiting"; stateT = 0; } }, 360);
     }
   }
 
@@ -2068,6 +2076,9 @@
     camera.updateProjectionMatrix();
   }
   window.addEventListener("resize", resize);
+  // keep the renderer crisp if the stage area's size changes for any reason
+  // (e.g. the header wrapping to a second row)
+  if (window.ResizeObserver) new ResizeObserver(resize).observe(stageWrap);
   resize();
 
   // ---- main loop ----
