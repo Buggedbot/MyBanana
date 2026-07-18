@@ -47,6 +47,12 @@
     letter-spacing: 0.4px;
     text-shadow: 0 2px 10px rgba(0,0,0,0.4);
   }
+  #logo {
+    cursor: pointer;
+    display: inline-block;
+    transition: transform 0.12s ease;
+  }
+  #logo.tap { transform: scale(1.35) rotate(-12deg); }
   .stats {
     display: flex;
     gap: 6px;
@@ -299,7 +305,7 @@
 <body>
 <div id="app">
   <header>
-    <h1>🍌 Peel the Banana</h1>
+    <h1><span id="logo">🍌</span> Peel the Banana</h1>
     <div class="stats">
       <span class="pill" id="timer">0.0s</span>
       <span class="pill" id="score">⭐ 0</span>
@@ -1284,7 +1290,13 @@
     watermelon: 0xff4d4d, cheese: 0xffc93c, matryoshka: 0xc8342a
   };
   RARITIES.forEach(function (r) { r.burstColor = BURST_COLORS[r.name]; });
+  var cheatIndex = -1; // -1 = off; otherwise the next tier to hand out, in order
   function pickRarity() {
+    // cheat active: serve every rare tier one by one, then return to luck
+    if (cheatIndex >= 0) {
+      if (cheatIndex < RARITIES.length) return RARITIES[cheatIndex++];
+      cheatIndex = -1;
+    }
     // every 100th banana is a guaranteed Trophy — a milestone reward
     if ((peeledCount + 1) % 100 === 0) {
       for (var t = 0; t < RARITIES.length; t++) {
@@ -1999,9 +2011,9 @@
     }
   }
 
-  function spawnNext() {
+  function spawnNext(forcedRarity) {
     current.dispose();
-    current = createBanana(pickRarity());
+    current = createBanana(forcedRarity !== undefined ? forcedRarity : pickRarity());
     current.setScale(0);
     scene.add(current.group);
     state = "entering";
@@ -2052,6 +2064,28 @@
     colProgressEl.textContent = found + "/" + RARITIES.length;
     collectBtn.textContent = "📖 " + found + "/" + RARITIES.length;
   }
+  // secret cheat: tap the banana logo 7 times while the current banana is
+  // still untouched, and every rare tier spawns one by one
+  var logoEl = document.getElementById("logo");
+  var cheatClicks = 0;
+  logoEl.addEventListener("click", function () {
+    logoEl.classList.remove("tap");
+    void logoEl.offsetWidth;
+    logoEl.classList.add("tap");
+    setTimeout(function () { logoEl.classList.remove("tap"); }, 140);
+    var untouched = current.strips.every(function (s) { return !s.peeled; });
+    if (!untouched || cheatIndex >= 0) { cheatClicks = 0; return; }
+    cheatClicks++;
+    if (cheatClicks >= 7) {
+      cheatClicks = 0;
+      cheatIndex = 0;
+      showToast("🍌 Cheat unlocked! Every rare, one by one ✨");
+      playSparkle();
+      buzz([40, 40, 80]);
+      spawnNext(RARITIES[cheatIndex++]); // swap the current banana for the first tier
+    }
+  });
+
   collectBtn.addEventListener("click", function () { collectionEl.classList.add("open"); });
   colCloseEl.addEventListener("click", function () { collectionEl.classList.remove("open"); });
   collectionEl.addEventListener("click", function (e) {
