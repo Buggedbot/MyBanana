@@ -309,7 +309,7 @@
     <div id="flash"></div>
     <div id="progress-bar"><div id="progress-fill"></div></div>
   </div>
-  <footer>Peel fast to chain combos · collect all 37 rare bananas</footer>
+  <footer>Peel fast to chain combos · collect all 38 rare bananas</footer>
   <div id="collection">
     <div class="col-card">
       <h2>📖 Collection <span id="col-progress"></span></h2>
@@ -1072,6 +1072,31 @@
     return canvasTex(c);
   }
 
+  // matryoshka: glossy folk-painted doll bands — cream, red floral, gold trim
+  function buildMatryoshkaTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#f7e7c3"; x.fillRect(0, 0, 256, 256);
+    x.fillStyle = "#c8342a"; x.fillRect(0, 88, 256, 80); // red sash band
+    [82, 174].forEach(function (y) { // gold trim lines
+      x.fillStyle = "#d4a017"; x.fillRect(0, y, 256, 6);
+    });
+    for (var f = 0; f < 6; f++) { // folk flowers on the sash
+      var fx = 22 + f * 42, fy = 128;
+      x.fillStyle = "#f7d354";
+      for (var p = 0; p < 6; p++) {
+        var a = p * Math.PI / 3;
+        x.beginPath(); x.ellipse(fx + Math.cos(a) * 9, fy + Math.sin(a) * 9, 4.5, 4.5, 0, 0, 6.2832); x.fill();
+      }
+      x.fillStyle = "#fff"; x.beginPath(); x.arc(fx, fy, 4, 0, 6.2832); x.fill();
+    }
+    x.fillStyle = "rgba(200,52,42,0.55)"; // little dots on the cream areas
+    for (var d = 0; d < 30; d++) {
+      var dy = Math.random() < 0.5 ? Math.random() * 76 : 180 + Math.random() * 70;
+      x.beginPath(); x.arc(Math.random() * 256, dy, 2, 0, 6.2832); x.fill();
+    }
+    return canvasTex(c);
+  }
+
   // dark chocolate coating scattered with colorful candy sprinkles
   function buildChocolateTexture() {
     var c = makeCanvas(256), x = c.getContext("2d");
@@ -1108,7 +1133,7 @@
     zebra: buildZebraTexture(), cyber: buildCyberTexture(),
     runic: buildRunicTexture(), festive: buildFestiveTexture(),
     berry: buildBerryTexture(), ninja: buildNinjaTexture(),
-    mystic: buildMysticTexture()
+    mystic: buildMysticTexture(), matryoshka: buildMatryoshkaTexture()
   };
 
   // ---- rarity tiers: each banana rolls one; the inner fruit takes the material.
@@ -1147,6 +1172,9 @@
     { name: "spooky", mult: 6, weight: 1.3, label: "🕸️ Spooky Banana", pulse: true, heartbeat: true,
       core: { color: 0xffffff, mapKind: "spooky", glowMap: true, metalness: 0.0, roughness: 0.7,
         emissive: 0xff7518, emissiveIntensity: 0.7, envMapIntensity: 0.5 } },
+    { name: "matryoshka", mult: 16, weight: 0.5, label: "🪆 Matryoshka Banana", nested: true,
+      core: { physical: true, color: 0xffffff, mapKind: "matryoshka", metalness: 0.0, roughness: 0.25,
+        clearcoat: 1.0, clearcoatRoughness: 0.12, emissive: 0x2a1005, emissiveIntensity: 0.08, envMapIntensity: 1.2 } },
     { name: "mystic", mult: 14, weight: 0.6, label: "🔮 Mystic Banana", pulse: true, sparkle: true, flow: { x: 0.04, y: 0 },
       core: { color: 0xffffff, mapKind: "mystic", glowMap: true, metalness: 0.0, roughness: 0.4,
         emissive: 0xb45cff, emissiveIntensity: 1.2, envMapIntensity: 0.7 } },
@@ -1246,7 +1274,7 @@
     bubblegum: 0xff69b4, honey: 0xffb300, spooky: 0xff7518,
     mystic: 0xb45cff, ninja: 0x3a3a44, cyber: 0x00e5ff, runic: 0x2ee6c8,
     festive: 0xff3333, bee: 0xffcc00, berry: 0x5566ff, zebra: 0xf2f0ea,
-    watermelon: 0xff4d4d, cheese: 0xffc93c
+    watermelon: 0xff4d4d, cheese: 0xffc93c, matryoshka: 0xc8342a
   };
   RARITIES.forEach(function (r) { r.burstColor = BURST_COLORS[r.name]; });
   function pickRarity() {
@@ -1293,7 +1321,8 @@
   }
 
   // ---- banana factory: each banana owns its own meshes + materials ----
-  function createBanana(rarity) {
+  function createBanana(rarity, baseScale) {
+    baseScale = baseScale || 1; // matryoshka layers pass < 1 for the nested bananas
     var group = new THREE.Group();
     group.rotation.set(0, 0.6, 0.12);
 
@@ -1401,8 +1430,9 @@
     return {
       group: group, strips: strips, done: false, rarity: rarity, coreMat: coreMat,
       baseTiltZ: group.rotation.z, sparklePhase: Math.random() * 10,
+      baseScale: baseScale, layer: 1,
       setOpacity: function (o) { mats.forEach(function (m) { m.opacity = o; }); },
-      setScale: function (s) { group.scale.setScalar(s); },
+      setScale: function (s) { group.scale.setScalar(s * baseScale); },
       dispose: function () {
         group.traverse(function (o) { if (o.geometry) o.geometry.dispose(); });
         mats.forEach(function (m) { m.dispose(); });
@@ -1859,8 +1889,9 @@
 
     var peeledStrips = current.strips.filter(function (st) { return st.peeled; }).length;
     progressFill.style.width = (peeledStrips / STRIP_COUNT * 100).toFixed(1) + "%";
-    // first opened strip reveals what's inside — announce it
-    if (peeledStrips === 1) {
+    // first opened strip reveals what's inside — announce it (only on the
+    // outermost matryoshka layer, so inner layers don't re-announce)
+    if (peeledStrips === 1 && current.layer === 1) {
       if (current.rarity) {
         var r = current.rarity;
         var isNew = !collection[r.name];
@@ -1882,6 +1913,29 @@
   function checkComplete() {
     if (current.done) return;
     if (current.strips.every(function (s) { return s.peeled; })) {
+      // matryoshka: peeling it all reveals a smaller banana inside — three deep
+      if (current.rarity && current.rarity.nested && current.layer < 3) {
+        current.done = true;
+        drag = null;
+        var r = current.rarity, nextLayer = current.layer + 1;
+        showToast("🪆 Another banana inside! (" + nextLayer + "/3)");
+        playSparkle();
+        buzz([25, 30, 45]);
+        kickWobble(1.0);
+        pMat.color.setHex(r.burstColor || 0xffd23f);
+        burst(current.group.localToWorld(new THREE.Vector3(0, 0, 0)));
+        addScore(40 * nextLayer);
+        floatPoint("+" + (40 * nextLayer), stageWrap.clientWidth / 2, stageWrap.clientHeight * 0.3);
+        current.dispose();
+        current = createBanana(r, Math.pow(0.72, nextLayer - 1));
+        current.layer = nextLayer;
+        scene.add(current.group);
+        state = "entering";
+        stateT = 0;
+        progressFill.style.width = "0%";
+        for (var ai = 0; ai < AMB_COUNT; ai++) ambLife[ai] = 0;
+        return; // the timer keeps running: all three layers are one timed peel
+      }
       current.done = true;
       drag = null;
       peeledCount++;
@@ -1929,7 +1983,7 @@
       } else {
         if (rname === "frozen" || rname === "crystal" || rname === "diamond" || rname === "obsidian" || rname === "runic") playShatter();
         else if (rname === "rotten" || rname === "cheese") playWomp();
-        else if (rname === "golden" || rname === "royal" || rname === "trophy" || rname === "mystic") playSparkle();
+        else if (rname === "golden" || rname === "royal" || rname === "trophy" || rname === "mystic" || rname === "matryoshka") playSparkle();
         buzz([30, 40, 60]);
       }
       // let the strips finish swinging, then drop the banana away
@@ -2153,7 +2207,8 @@
       if (current.rarity && current.rarity.breatheAmp) breathe = 1 + current.rarity.breatheAmp * Math.sin(now * 0.0024);
       else if (current.rarity && current.rarity.hueShift) breathe = 1 + 0.035 * Math.sin(now * 0.0032);
       var w = wobbleAmp * Math.sin(wobbleT * 16);
-      g.scale.set(breathe * (1 + 0.05 * w), breathe * (1 - 0.07 * w), breathe * (1 + 0.05 * w));
+      var bs = current.baseScale;
+      g.scale.set(bs * breathe * (1 + 0.05 * w), bs * breathe * (1 - 0.07 * w), bs * breathe * (1 + 0.05 * w));
       if (started) {
         bananaElapsed = (now - bananaStart) / 1000;
         timerEl.textContent = bananaElapsed.toFixed(1) + "s";
