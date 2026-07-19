@@ -1722,12 +1722,13 @@
     denim: 0x3b5b8c, sushi: 0xf5f0e0, treasuremap: 0xe8d4a0, camo: 0x5a5c38
   };
   RARITIES.forEach(function (r) { r.burstColor = BURST_COLORS[r.name]; });
-  var cheatIndex = -1; // -1 = off; otherwise the next tier to hand out, in order
+  var cheatQueue = null; // null = off; otherwise the still-locked tiers left to hand out
   function pickRarity() {
-    // cheat active: serve every rare tier one by one, then return to luck
-    if (cheatIndex >= 0) {
-      if (cheatIndex < RARITIES.length) return RARITIES[cheatIndex++];
-      cheatIndex = -1;
+    // cheat active: serve only the tiers not yet in the collection, one by
+    // one, skipping anything already unlocked — then return to normal luck
+    if (cheatQueue) {
+      if (cheatQueue.length) return cheatQueue.shift();
+      cheatQueue = null;
     }
     // every 100th banana is a guaranteed Trophy — a milestone reward
     if ((peeledCount + 1) % 100 === 0) {
@@ -2629,7 +2630,7 @@
     collectBtn.textContent = "📖 " + found + "/" + RARITIES.length;
   }
   // secret cheat: tap the banana logo 7 times while the current banana is
-  // still untouched, and every rare tier spawns one by one
+  // still untouched, and every STILL-LOCKED rare tier spawns one by one
   var logoEl = document.getElementById("logo");
   var cheatClicks = 0;
   logoEl.addEventListener("click", function () {
@@ -2638,15 +2639,22 @@
     logoEl.classList.add("tap");
     setTimeout(function () { logoEl.classList.remove("tap"); }, 140);
     var untouched = current.strips.every(function (s) { return !s.peeled; });
-    if (!untouched || cheatIndex >= 0) { cheatClicks = 0; return; }
+    if (!untouched || cheatQueue) { cheatClicks = 0; return; }
     cheatClicks++;
     if (cheatClicks >= 7) {
       cheatClicks = 0;
-      cheatIndex = 0;
-      showToast("🍌 Cheat unlocked! Every rare, one by one ✨");
+      var locked = RARITIES.filter(function (r) { return !collection[r.name]; });
+      if (!locked.length) {
+        showToast("📖 Every rare already collected! ✨");
+        playSparkle();
+        buzz([40, 40, 80]);
+        return;
+      }
+      cheatQueue = locked;
+      showToast("🍌 Cheat unlocked! Every locked rare, one by one ✨");
       playSparkle();
       buzz([40, 40, 80]);
-      spawnNext(RARITIES[cheatIndex++]); // swap the current banana for the first tier
+      spawnNext(cheatQueue.shift()); // swap the current banana for the first locked tier
     }
   });
 
