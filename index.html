@@ -322,7 +322,7 @@
     <div id="flash"></div>
     <div id="progress-bar"><div id="progress-fill"></div></div>
   </div>
-  <footer>Peel fast to chain combos · collect all 68 rare bananas</footer>
+  <footer>Peel fast to chain combos · collect all 78 rare bananas</footer>
   <div id="collection">
     <div class="col-card">
       <h2>📖 Collection <span id="col-progress"></span></h2>
@@ -1615,6 +1615,171 @@
     return canvasTex(c);
   }
 
+  // phoenix: fiery ember-feather pattern
+  function buildPhoenixTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    var g = x.createLinearGradient(0, 0, 0, 256);
+    g.addColorStop(0, "#ffb020"); g.addColorStop(0.5, "#ff4d1e"); g.addColorStop(1, "#8c0e0e");
+    x.fillStyle = g; x.fillRect(0, 0, 256, 256);
+    for (var f = 0; f < 20; f++) { // feather strokes
+      var fx = Math.random() * 256, fy = Math.random() * 256, len = 18 + Math.random() * 26;
+      x.strokeStyle = "rgba(255,220,120,0.5)"; x.lineWidth = 2.2; x.lineCap = "round";
+      x.beginPath(); x.moveTo(fx, fy); x.lineTo(fx, fy - len); x.stroke();
+    }
+    for (var n = 0; n < 40; n++) {
+      x.fillStyle = "rgba(255,240,180," + (0.3 + Math.random() * 0.5).toFixed(2) + ")";
+      x.beginPath(); x.arc(Math.random() * 256, Math.random() * 256, Math.random() * 1.6 + 0.4, 0, 6.2832); x.fill();
+    }
+    return canvasTex(c);
+  }
+
+  // aurora: shifting green-purple curtain bands
+  function buildAuroraTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#040814"; x.fillRect(0, 0, 256, 256);
+    var cols = [["rgba(40,220,140,0.55)", 0.15], ["rgba(90,120,255,0.5)", 0.45], ["rgba(180,90,255,0.5)", 0.72]];
+    cols.forEach(function (pair) {
+      var y = pair[1] * 256;
+      var g = x.createLinearGradient(0, y - 50, 0, y + 50);
+      g.addColorStop(0, "rgba(0,0,0,0)"); g.addColorStop(0.5, pair[0]); g.addColorStop(1, "rgba(0,0,0,0)");
+      x.fillStyle = g; x.fillRect(0, 0, 256, 256);
+    });
+    for (var n = 0; n < 60; n++) {
+      x.fillStyle = "rgba(255,255,255," + (0.2 + Math.random() * 0.4).toFixed(2) + ")";
+      x.beginPath(); x.arc(Math.random() * 256, Math.random() * 256, Math.random() * 1.1 + 0.2, 0, 6.2832); x.fill();
+    }
+    return canvasTex(c);
+  }
+
+  // piñata: bright multicolor tissue-paper fringe
+  function buildPinataTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    var cols = ["#ff2d6e", "#ffd400", "#00c2ff", "#7bec6a", "#ff8c1e", "#b45cff"];
+    for (var row = 0; row < 8; row++) {
+      var col = cols[row % cols.length];
+      x.fillStyle = col;
+      x.fillRect(0, row * 32, 256, 30);
+      x.fillStyle = "rgba(0,0,0,0.12)";
+      for (var t = 0; t < 16; t++) {
+        x.beginPath(); x.moveTo(t * 16, row * 32 + 30); x.lineTo(t * 16 + 8, row * 32 + 22); x.lineTo(t * 16 + 16, row * 32 + 30); x.fill();
+      }
+    }
+    return canvasTex(c);
+  }
+
+  // clockwork: brass gears and cogs
+  function buildClockworkTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#8a6a2a"; x.fillRect(0, 0, 256, 256);
+    for (var n = 0; n < 6; n++) {
+      var cx = Math.random() * 256, cy = Math.random() * 256, r = 14 + Math.random() * 18;
+      x.strokeStyle = "rgba(60,42,10,0.6)"; x.lineWidth = 2;
+      x.beginPath(); x.arc(cx, cy, r, 0, 6.2832); x.stroke();
+      for (var tooth = 0; tooth < 10; tooth++) {
+        var a = tooth * Math.PI / 5;
+        x.beginPath(); x.moveTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r);
+        x.lineTo(cx + Math.cos(a) * (r + 5), cy + Math.sin(a) * (r + 5)); x.stroke();
+      }
+      x.fillStyle = "rgba(60,42,10,0.5)";
+      x.beginPath(); x.arc(cx, cy, 3, 0, 6.2832); x.fill();
+    }
+    return canvasTex(c);
+  }
+
+  // compass: engraved brass explorer's compass
+  function buildCompassTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#c9a24a"; x.fillRect(0, 0, 256, 256);
+    x.strokeStyle = "rgba(90,60,10,0.65)"; x.lineWidth = 1.6;
+    x.save(); x.translate(128, 128);
+    x.beginPath(); x.arc(0, 0, 70, 0, 6.2832); x.stroke();
+    x.beginPath(); x.arc(0, 0, 50, 0, 6.2832); x.stroke();
+    for (var t = 0; t < 16; t++) {
+      var a = t * Math.PI / 8;
+      x.beginPath(); x.moveTo(Math.cos(a) * 50, Math.sin(a) * 50); x.lineTo(Math.cos(a) * 70, Math.sin(a) * 70); x.stroke();
+    }
+    x.fillStyle = "rgba(160,20,20,0.75)";
+    x.beginPath(); x.moveTo(0, -60); x.lineTo(10, 0); x.lineTo(0, 8); x.lineTo(-10, 0); x.closePath(); x.fill();
+    x.fillStyle = "rgba(90,60,10,0.7)";
+    x.beginPath(); x.moveTo(0, 60); x.lineTo(10, 0); x.lineTo(0, -8); x.lineTo(-10, 0); x.closePath(); x.fill();
+    x.restore();
+    return canvasTex(c);
+  }
+
+  // comet: icy blue-white with a streaking tail
+  function buildCometTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    var g = x.createLinearGradient(0, 0, 0, 256);
+    g.addColorStop(0, "#eaf7ff"); g.addColorStop(1, "#5aa8e0");
+    x.fillStyle = g; x.fillRect(0, 0, 256, 256);
+    for (var s = 0; s < 12; s++) {
+      var sy = Math.random() * 256;
+      x.strokeStyle = "rgba(255,255,255," + (0.2 + Math.random() * 0.4).toFixed(2) + ")";
+      x.lineWidth = 1 + Math.random() * 2;
+      x.beginPath(); x.moveTo(0, sy); x.lineTo(256, sy + (Math.random() * 20 - 10)); x.stroke();
+    }
+    return canvasTex(c);
+  }
+
+  // origami: folded paper-crane creases
+  function buildOrigamiTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#f0e6d4"; x.fillRect(0, 0, 256, 256);
+    x.strokeStyle = "rgba(150,120,80,0.5)"; x.lineWidth = 1.4;
+    for (var n = 0; n < 14; n++) {
+      var sx = Math.random() * 256, sy = Math.random() * 256;
+      x.beginPath(); x.moveTo(sx, sy);
+      x.lineTo(sx + (Math.random() * 80 - 40), sy + (Math.random() * 80 - 40)); x.stroke();
+    }
+    return canvasTex(c);
+  }
+
+  // angel: white feathers with a soft halo glow
+  function buildAngelTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#fdfaf2"; x.fillRect(0, 0, 256, 256);
+    for (var f = 0; f < 30; f++) {
+      var fx = Math.random() * 256, fy = Math.random() * 256, len = 14 + Math.random() * 20;
+      x.strokeStyle = "rgba(220,210,190,0.4)"; x.lineWidth = 1.6; x.lineCap = "round";
+      x.beginPath(); x.moveTo(fx, fy); x.lineTo(fx, fy - len); x.stroke();
+    }
+    var g = x.createRadialGradient(128, 60, 6, 128, 60, 40);
+    g.addColorStop(0, "rgba(255,240,180,0.7)"); g.addColorStop(1, "rgba(255,240,180,0)");
+    x.fillStyle = g; x.beginPath(); x.arc(128, 60, 40, 0, 6.2832); x.fill();
+    return canvasTex(c);
+  }
+
+  // imp: devilish red with small horns pattern
+  function buildImpTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#7a0e14"; x.fillRect(0, 0, 256, 256);
+    for (var n = 0; n < 8; n++) {
+      var fx = Math.random() * 256, fy = Math.random() * 256;
+      x.fillStyle = "#1a0505";
+      x.beginPath(); x.moveTo(fx, fy); x.lineTo(fx - 6, fy - 16); x.lineTo(fx + 2, fy - 4); x.closePath(); x.fill();
+    }
+    x.fillStyle = "rgba(255,60,40,0.25)";
+    for (var m = 0; m < 30; m++) {
+      x.beginPath(); x.arc(Math.random() * 256, Math.random() * 256, Math.random() * 2 + 0.5, 0, 6.2832); x.fill();
+    }
+    return canvasTex(c);
+  }
+
+  // rubber duck: glossy yellow with a duck bill/eye
+  function buildDuckTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#ffd400"; x.fillRect(0, 0, 256, 256);
+    x.fillStyle = "#ff8c1e";
+    x.beginPath(); x.ellipse(128, 40, 34, 16, 0, 0, 6.2832); x.fill();
+    x.fillStyle = "#141210";
+    x.beginPath(); x.arc(100, 90, 8, 0, 6.2832); x.fill();
+    x.beginPath(); x.arc(156, 90, 8, 0, 6.2832); x.fill();
+    x.fillStyle = "rgba(255,255,255,0.5)";
+    x.beginPath(); x.arc(97, 87, 2.4, 0, 6.2832); x.fill();
+    x.beginPath(); x.arc(153, 87, 2.4, 0, 6.2832); x.fill();
+    return canvasTex(c);
+  }
+
   // dark chocolate coating scattered with colorful candy sprinkles
   function buildChocolateTexture() {
     var c = makeCanvas(256), x = c.getContext("2d");
@@ -1666,7 +1831,11 @@
     soda: buildSodaTexture(), virus: buildVirusTexture(),
     battery: buildBatteryTexture(), joker: buildJokerTexture(),
     cursed: buildCursedTexture(), candle: buildCandleTexture(),
-    storm: buildStormTexture()
+    storm: buildStormTexture(), phoenix: buildPhoenixTexture(),
+    aurora: buildAuroraTexture(), pinata: buildPinataTexture(),
+    clockwork: buildClockworkTexture(), compass: buildCompassTexture(),
+    comet: buildCometTexture(), origami: buildOrigamiTexture(),
+    angel: buildAngelTexture(), imp: buildImpTexture(), duck: buildDuckTexture()
   };
 
   // ---- rarity tiers: each banana rolls one; the inner fruit takes the material.
@@ -1823,6 +1992,37 @@
     { name: "candle", mult: 5, weight: 1.7, label: "🕯️ Candle Banana", flame: true,
       core: { physical: true, color: 0xffffff, mapKind: "candle", metalness: 0.0, roughness: 0.3,
         clearcoat: 0.6, clearcoatRoughness: 0.3, emissive: 0xffb84a, emissiveIntensity: 0.1, envMapIntensity: 1.0 } },
+    { name: "phoenix", mult: 14, weight: 0.6, label: "🔥🐦 Phoenix Banana", pulse: true, comboCarry: true,
+      core: { color: 0xffffff, mapKind: "phoenix", metalness: 0.0, roughness: 0.4,
+        emissive: 0xff5a1e, emissiveIntensity: 0.45, envMapIntensity: 0.8 } },
+    { name: "angel", mult: 12, weight: 0.75, label: "👼 Angel Banana", pulse: true, bestBonus: true, floaty: true,
+      core: { physical: true, color: 0xffffff, mapKind: "angel", metalness: 0.0, roughness: 0.3,
+        clearcoat: 0.6, clearcoatRoughness: 0.3, emissive: 0xffedb0, emissiveIntensity: 0.3, envMapIntensity: 1.1 } },
+    { name: "imp", mult: 9, weight: 0.95, label: "😈 Imp Banana", pulse: true, fastPulse: true, gambleMult: true,
+      core: { color: 0xffffff, mapKind: "imp", metalness: 0.0, roughness: 0.45,
+        emissive: 0xff2020, emissiveIntensity: 0.35, envMapIntensity: 0.8 } },
+    { name: "compass", mult: 10, weight: 0.9, label: "🧭 Compass Banana", hint: true,
+      core: { physical: true, color: 0xffffff, mapKind: "compass", metalness: 0.7, roughness: 0.3,
+        clearcoat: 0.6, clearcoatRoughness: 0.2, emissive: 0x2a1c04, emissiveIntensity: 0.08, envMapIntensity: 1.4 } },
+    { name: "pinata", mult: 8, weight: 1.1, label: "🎉 Piñata Banana", bigBurst: true,
+      multiBurstColors: [0xff2d6e, 0xffd400, 0x00c2ff, 0x7bec6a, 0xff8c1e, 0xb45cff],
+      core: { color: 0xffffff, mapKind: "pinata", metalness: 0.0, roughness: 0.6,
+        emissive: 0x1a1a1a, emissiveIntensity: 0.06, envMapIntensity: 0.7 } },
+    { name: "clockwork", mult: 7, weight: 1.3, label: "⚙️ Clockwork Banana", rhythmBonus: true,
+      core: { physical: true, color: 0xb08a3a, metalness: 0.9, roughness: 0.28, clearcoat: 0.5, clearcoatRoughness: 0.25,
+        mapKind: "clockwork", emissive: 0x2a1c04, emissiveIntensity: 0.08, envMapIntensity: 1.5 } },
+    { name: "comet", mult: 7, weight: 1.3, label: "☄️ Comet Banana", falling: true,
+      core: { physical: true, color: 0xffffff, mapKind: "comet", metalness: 0.1, roughness: 0.2,
+        clearcoat: 0.7, clearcoatRoughness: 0.2, emissive: 0x6fc4ff, emissiveIntensity: 0.2, envMapIntensity: 1.3 } },
+    { name: "origami", mult: 6, weight: 1.5, label: "🪭 Origami Banana", sharpFold: true,
+      core: { color: 0xffffff, mapKind: "origami", metalness: 0.0, roughness: 0.65,
+        emissive: 0x000000, emissiveIntensity: 0, envMapIntensity: 0.6 } },
+    { name: "duck", mult: 5, weight: 1.7, label: "🦆 Rubber Duck Banana", squeaky: true, floaty: true,
+      core: { physical: true, color: 0xffffff, mapKind: "duck", metalness: 0.0, roughness: 0.2,
+        clearcoat: 0.9, clearcoatRoughness: 0.1, emissive: 0x2a1c00, emissiveIntensity: 0.05, envMapIntensity: 1.2 } },
+    { name: "aurora", mult: 9, weight: 1.0, label: "🌌 Aurora Banana", flow: { x: 0, y: 0.06 },
+      core: { color: 0xffffff, mapKind: "aurora", glowMap: true, metalness: 0.1, roughness: 0.4,
+        emissive: 0x5adcb0, emissiveIntensity: 0.6, envMapIntensity: 0.7 } },
     { name: "graffiti", mult: 6, weight: 1.5, label: "🎨 Graffiti Banana", flow: { x: 0, y: 0.14 },
       multiBurstColors: [0xff2d9e, 0x00e5ff, 0xffd400, 0x7bec6a, 0xff5a30],
       core: { color: 0xffffff, mapKind: "graffiti", metalness: 0.0, roughness: 0.6,
@@ -1909,11 +2109,14 @@
     denim: 0x3b5b8c, sushi: 0xf5f0e0, treasuremap: 0xe8d4a0, camo: 0x5a5c38,
     cursed: 0x7a1414, joker: 0xc8141e, saturn: 0xe0c284, virus: 0x8caa2a,
     storm: 0xffe94a, jackpot: 0xffd700, battery: 0x3ce03c, musical: 0xf8f6f0,
-    soda: 0xffcf60, candle: 0xffb84a
+    soda: 0xffcf60, candle: 0xffb84a, phoenix: 0xff5a1e, angel: 0xffedb0,
+    imp: 0xff2020, compass: 0xc9a24a, pinata: 0xff2d6e, clockwork: 0xb08a3a,
+    comet: 0x6fc4ff, origami: 0xf0e6d4, duck: 0xffd400, aurora: 0x5adcb0
   };
   RARITIES.forEach(function (r) { r.burstColor = BURST_COLORS[r.name]; });
   var cheatQueue = null; // null = off; otherwise the still-locked tiers left to hand out
   var forceNextRare = false; // set by the virus banana's infection effect
+  var comboGraceUntil = 0; // set by the phoenix banana's combo-carry effect
   function pickRarity() {
     // cheat active: serve only the tiers not yet in the collection, one by
     // one, skipping anything already unlocked — then return to normal luck
@@ -2060,26 +2263,34 @@
 
       // each strip rolls one of four distinct peel styles, so the finished
       // banana's silhouette is different every time
-      var styleRoll = Math.random(), foldAngle, curlAngle;
-      if (styleRoll < 0.3) {         // tight curler: the tip rolls into a spiral
+      var styleRoll = Math.random(), foldAngle, curlAngle, foldRamp;
+      if (rarity && rarity.sharpFold) {
+        // origami: crisp, angular creases instead of a soft organic curl
+        foldAngle = PEEL_FOLD * 1.35;
+        curlAngle = PEEL_CURL * 0.1;
+        foldRamp = 0.08; // the crease snaps in almost instantly, close to the hinge
+      } else if (styleRoll < 0.3) {         // tight curler: the tip rolls into a spiral
         foldAngle = PEEL_FOLD * (0.6 + Math.random() * 0.3);
         curlAngle = PEEL_CURL * (1.8 + Math.random() * 1.4);
+        foldRamp = 0.22 + Math.random() * 0.18;
       } else if (styleRoll < 0.55) { // flare: barely curls, juts out like a star petal
         foldAngle = PEEL_FOLD * (0.55 + Math.random() * 0.25);
         curlAngle = PEEL_CURL * (0.15 + Math.random() * 0.3);
+        foldRamp = 0.22 + Math.random() * 0.18;
       } else if (styleRoll < 0.8) {  // classic droop
         foldAngle = PEEL_FOLD * (0.9 + Math.random() * 0.3);
         curlAngle = PEEL_CURL * (0.6 + Math.random() * 0.6);
+        foldRamp = 0.22 + Math.random() * 0.18;
       } else {                       // hang-down: folds far and hugs the trunk
         foldAngle = PEEL_FOLD * (1.15 + Math.random() * 0.25);
         curlAngle = PEEL_CURL * (0.5 + Math.random() * 0.5);
+        foldRamp = 0.22 + Math.random() * 0.18;
       }
 
       strips.push({
         mesh: mesh, hinge: hinge, axis: axis, spine: spine,
         peel: 0, peelTarget: 0, peeled: false,
-        foldAngle: foldAngle, curlAngle: curlAngle,
-        foldRamp: 0.22 + Math.random() * 0.18,
+        foldAngle: foldAngle, curlAngle: curlAngle, foldRamp: foldRamp,
         basePos: geo.attributes.position.array.slice(0), lastPeel: -1
       });
     }
@@ -2221,7 +2432,10 @@
     virus:     { color: 0x8caa2a, dir: 0, spread: 0.5, speed: 0.5, life: 1.0, size: 0.05, wobble: true },   // spore drift
     storm:     { color: 0xc8ccd8, dir: -1, spread: 0.7, speed: 0.9, life: 0.9, size: 0.05 },                // rain
     candle:    { color: 0xffe0a0, dir: -1, spread: 0.18, speed: 0.14, life: 2.0, size: 0.06 },              // wax drips
-    battery:   { color: 0x3ce03c, dir: 1, spread: 0.4, speed: 0.3, life: 1.2, size: 0.05, wobble: true }    // charge sparks
+    battery:   { color: 0x3ce03c, dir: 1, spread: 0.4, speed: 0.3, life: 1.2, size: 0.05, wobble: true },   // charge sparks
+    phoenix:   { color: 0xff8020, dir: 1, spread: 0.35, speed: 0.6, life: 1.1, size: 0.07 },                // rising embers
+    comet:     { color: 0xbfe8ff, dir: -1, spread: 0.15, speed: 0.5, life: 0.9, size: 0.05 },               // icy trail
+    angel:     { color: 0xffedb0, dir: 1, spread: 0.5, speed: 0.08, life: 2.4, size: 0.055, wobble: true }  // drifting light
   };
 
   function respawnAmbient(i, cfg, center) {
@@ -2545,6 +2759,36 @@
       src.start(t); src.stop(t + 0.05);
     }
   }
+  // a cheerful rubber-duck squeak for each strip peeled
+  function playSqueak() {
+    var ctx = ensureAudio(); if (!ctx) return;
+    var t = ctx.currentTime;
+    var o = ctx.createOscillator(); o.type = "square";
+    o.frequency.setValueAtTime(900, t);
+    o.frequency.exponentialRampToValueAtTime(1600, t + 0.06);
+    o.frequency.exponentialRampToValueAtTime(700, t + 0.13);
+    var g = ctx.createGain();
+    g.gain.setValueAtTime(0.001, t);
+    g.gain.linearRampToValueAtTime(0.16, t + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(t); o.stop(t + 0.16);
+  }
+  // a cheering party crowd for the piñata's completion
+  function playCheer() {
+    var ctx = ensureAudio(); if (!ctx) return;
+    for (var i = 0; i < 16; i++) {
+      var t = ctx.currentTime + Math.random() * 0.5;
+      var o = ctx.createOscillator(); o.type = "sine";
+      o.frequency.value = 500 + Math.random() * 500;
+      var g = ctx.createGain();
+      g.gain.setValueAtTime(0.001, t);
+      g.gain.linearRampToValueAtTime(0.06, t + 0.05);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.3 + Math.random() * 0.3);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(t); o.stop(t + 0.7);
+    }
+  }
   function buzz(pattern) {
     try { if (navigator.vibrate) navigator.vibrate(pattern); } catch (e) {}
   }
@@ -2699,6 +2943,8 @@
     if (current.rarity && current.rarity.musical) {
       var idx = current.strips.filter(function (st) { return st.peeled; }).length - 1;
       playNote(MELODY[idx % MELODY.length], 0.4);
+    } else if (current.rarity && current.rarity.squeaky) {
+      playSqueak();
     } else {
       playRip(1, true); // the final tear as the strip comes free
     }
@@ -2706,10 +2952,13 @@
     kickWobble(0.9); // satisfying jelly snap as the strip comes free
 
     // combo chain: strips torn within the window multiply the points —
-    // denim shields the chain with a much wider window while it's active
+    // denim shields the chain with a much wider window while it's active,
+    // and a phoenix's grace period (set on its own completion) protects the
+    // transition into whatever banana spawns next
     var nowMs = performance.now();
     var comboWin = (current.rarity && current.rarity.comboShield) ? COMBO_WINDOW * 6 : COMBO_WINDOW;
-    combo = (nowMs - lastStripAt <= comboWin) ? combo + 1 : 1;
+    var inGrace = nowMs < comboGraceUntil;
+    combo = (inGrace || nowMs - lastStripAt <= comboWin) ? combo + 1 : 1;
     lastStripAt = nowMs;
     var mult = combo; // no cap — chains can climb as high as you can peel
     var pts = 10 * mult;
@@ -2742,6 +2991,16 @@
           revealMsg = pool[Math.random() * pool.length | 0]; // the 8-ball / map answers
         }
         if (r.dangerMsg) revealMsg += " ☠️ Careful!";
+        if (r.hint) {
+          // compass: points toward one tier you haven't found yet
+          var undiscovered = RARITIES.filter(function (r2) { return r2.name !== "compass" && !collection[r2.name]; });
+          if (undiscovered.length) {
+            var target = undiscovered[Math.random() * undiscovered.length | 0];
+            revealMsg = "🧭 The needle points toward... " + target.label + "!";
+          } else {
+            revealMsg = "🧭 Every direction leads home — you've found them all!";
+          }
+        }
         showToast(revealMsg);
         if (r.revealSound === "roar") playRoar();
         else if (r.revealSound === "rumble") playRumble();
@@ -2792,6 +3051,7 @@
       // completion bonus scaled by rarity, plus a speed bonus for quick peels
       var isTNT = current.rarity && current.rarity.name === "tnt";
       var rr = current.rarity;
+      var isNewBest = started && (best === null || bananaElapsed < best);
       var bonus = 50 * (rr ? rr.mult : 1);
       var speedBonus = (started && bananaElapsed < 6) ? 100 : 0;
       var bonusTag = "";
@@ -2811,14 +3071,34 @@
         var fizzMul = 1 + (current.shakeMeter / 100) * 1.5;
         bonus = Math.round(bonus * fizzMul);
         bonusTag = current.shakeMeter > 50 ? " 🍾💥" : "";
+      } else if (rr && rr.rhythmBonus) {
+        // clockwork: bonus scales by how close the finish lands to a whole second
+        var frac = bananaElapsed - Math.floor(bananaElapsed);
+        var closeness = 1 - Math.min(frac, 1 - frac) * 2; // 1 = dead on the tick, 0 = furthest off
+        bonus = Math.round(bonus * (1 + closeness * 2));
+        bonusTag = closeness > 0.85 ? " ⚙️🎯" : "";
       }
+      if (rr && rr.gambleMult) {
+        // imp: whatever bonus you'd have earned gets multiplied by a wild 0.5x-2.5x roll
+        var gamble = 0.5 + Math.random() * 2;
+        bonus = Math.round(bonus * gamble);
+        bonusTag += gamble >= 2 ? " 😈⬆️" : gamble <= 0.8 ? " 😈⬇️" : "";
+      }
+      if (rr && rr.bestBonus && isNewBest) {
+        // angel: doubles the payout specifically when you set a new record
+        bonus *= 2;
+        bonusTag += " 👼×2";
+      }
+      // phoenix: its own completion doesn't end the streak — the combo carries
+      // into whatever spawns next instead of expiring on the usual timer
+      if (rr && rr.comboCarry) comboGraceUntil = performance.now() + 10000;
       addScore(bonus + speedBonus);
       floatPoint("+" + (bonus + speedBonus) + bonusTag + (speedBonus ? " ⚡" : ""),
         stageWrap.clientWidth / 2, stageWrap.clientHeight * 0.3);
 
       var tag = current.rarity ? current.rarity.label + " — " : "";
       var msg;
-      if (started && (best === null || bananaElapsed < best)) {
+      if (isNewBest) {
         best = bananaElapsed;
         try { localStorage.setItem("banana_best_time", String(best)); } catch (e) {}
         updateBest();
@@ -2850,7 +3130,8 @@
       }
       pMat.color.setHex(burstCol);
       var burstCenter = current.group.localToWorld(new THREE.Vector3(0, 0, 0));
-      burst(burstCenter, isTNT || rname === "golden" || rname === "diamond" || rname === "royal" || rname === "trophy");
+      var isBig = isTNT || rname === "golden" || rname === "diamond" || rname === "royal" || rname === "trophy" || (rr && rr.bigBurst);
+      burst(burstCenter, isBig);
       if (isTNT) {
         playBoom();
         buzz([60, 50, 120]);
@@ -2874,6 +3155,7 @@
           playRumble();
           flashEl.classList.remove("on"); void flashEl.offsetWidth; flashEl.classList.add("on");
         }
+        else if (rname === "pinata") playCheer();
         buzz([30, 40, 60]);
       }
       // let the strips finish swinging, then drop the banana away (whatever
@@ -3152,9 +3434,10 @@
     updateAmbient(dt, now);
 
     // combo chain expires if the next strip doesn't come in time — denim
-    // shields the chain with a much wider window while it's the active banana
+    // shields the chain with a much wider window while it's the active banana,
+    // and a phoenix's grace period pauses the countdown entirely
     var comboWindow = (current.rarity && current.rarity.comboShield) ? COMBO_WINDOW * 6 : COMBO_WINDOW;
-    if (combo > 0 && performance.now() - lastStripAt > comboWindow) {
+    if (combo > 0 && performance.now() >= comboGraceUntil && performance.now() - lastStripAt > comboWindow) {
       combo = 0;
       comboEl.classList.remove("on");
     }
@@ -3172,6 +3455,11 @@
       // the dream banana floats higher and bobs on bigger, slower swells
       var floaty = current.rarity && current.rarity.floaty;
       g.position.y = BASE_Y + (floaty ? 0.35 : 0) + Math.sin(now * 0.0018) * (floaty ? BOB_AMP * 3 : BOB_AMP);
+      // the comet slowly falls, picking up speed the longer you take
+      if (current.rarity && current.rarity.falling) {
+        var fallT = (now - current.chargeStart) / 1000;
+        g.position.y -= Math.min(2.2, 0.02 * fallT * fallT);
+      }
       g.position.x = 0;
       // jelly wobble (squash one axis, stretch the others) on grabs and tears,
       // layered over slow breathing (rainbow subtle, bubblegum chewy) —
