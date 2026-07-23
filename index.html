@@ -322,7 +322,7 @@
     <div id="flash"></div>
     <div id="progress-bar"><div id="progress-fill"></div></div>
   </div>
-  <footer>Peel fast to chain combos · collect all 108 rare bananas</footer>
+  <footer>Peel fast to chain combos · collect all 118 rare bananas</footer>
   <div id="collection">
     <div class="col-card">
       <h2>📖 Collection <span id="col-progress"></span></h2>
@@ -2098,6 +2098,85 @@
     return canvasTex(c);
   }
 
+  // ---- 10 more procedural textures ----
+  function buildDinoTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#3a8a3a"; x.fillRect(0, 0, 256, 256);
+    for (var n = 0; n < 30; n++) { var fx = Math.random() * 256, fy = Math.random() * 256, r = 6 + Math.random() * 12; var g = x.createRadialGradient(fx, fy, 0, fx, fy, r); g.addColorStop(0, "rgba(20,60,20,0.6)"); g.addColorStop(1, "rgba(20,60,20,0)"); x.fillStyle = g; x.beginPath(); x.arc(fx, fy, r, 0, 6.2832); x.fill(); }
+    x.fillStyle = "#e0d060"; for (var s = 0; s < 8; s++) { var sy = s * 34; x.beginPath(); x.moveTo(128, sy); x.lineTo(120, sy + 16); x.lineTo(136, sy + 16); x.closePath(); x.fill(); } // spine plates
+    return canvasTex(c);
+  }
+  function buildMushroomTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#e02020"; x.fillRect(0, 0, 256, 128); x.fillStyle = "#f4ecd8"; x.fillRect(0, 128, 256, 128);
+    x.fillStyle = "#fff"; for (var n = 0; n < 12; n++) { x.beginPath(); x.arc(Math.random() * 256, Math.random() * 120, 6 + Math.random() * 8, 0, 6.2832); x.fill(); }
+    x.fillStyle = "rgba(180,150,120,0.4)"; for (var g = 0; g < 8; g++) { x.fillRect(g * 32, 132, 3, 120); }
+    return canvasTex(c);
+  }
+  function buildChronoTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#e8e0c8"; x.fillRect(0, 0, 256, 256);
+    x.strokeStyle = "#2a2418"; x.lineWidth = 4; x.save(); x.translate(128, 128);
+    x.beginPath(); x.arc(0, 0, 90, 0, 6.2832); x.stroke();
+    for (var t = 0; t < 12; t++) { var a = t * Math.PI / 6; x.beginPath(); x.moveTo(Math.cos(a) * 78, Math.sin(a) * 78); x.lineTo(Math.cos(a) * 90, Math.sin(a) * 90); x.stroke(); }
+    x.lineWidth = 6; x.beginPath(); x.moveTo(0, 0); x.lineTo(0, -60); x.stroke();
+    x.lineWidth = 4; x.beginPath(); x.moveTo(0, 0); x.lineTo(44, 20); x.stroke();
+    x.restore();
+    return canvasTex(c);
+  }
+  function buildDiceTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#f8f6f0"; x.fillRect(0, 0, 256, 256);
+    x.strokeStyle = "rgba(40,40,40,0.3)"; x.lineWidth = 3; x.strokeRect(4, 4, 248, 248);
+    function pip(px, py) { x.fillStyle = "#1a1a1a"; x.beginPath(); x.arc(px, py, 14, 0, 6.2832); x.fill(); }
+    pip(64, 64); pip(192, 64); pip(64, 192); pip(192, 192); pip(128, 128); pip(64, 128); pip(192, 128);
+    return canvasTex(c);
+  }
+  function buildButterflyTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    var g = x.createLinearGradient(0, 0, 256, 256); g.addColorStop(0, "#ff5aa0"); g.addColorStop(0.5, "#a05aff"); g.addColorStop(1, "#5ad0ff"); x.fillStyle = g; x.fillRect(0, 0, 256, 256);
+    x.fillStyle = "rgba(20,10,30,0.6)"; for (var n = 0; n < 12; n++) { var fx = Math.random() * 256, fy = Math.random() * 256; x.beginPath(); x.ellipse(fx, fy, 10, 16, Math.random() * 3, 0, 6.2832); x.fill(); x.save(); x.fillStyle = "rgba(255,255,255,0.5)"; x.beginPath(); x.arc(fx, fy, 3, 0, 6.2832); x.fill(); x.restore(); }
+    return canvasTex(c);
+  }
+  function buildCactusTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#3fa04a"; x.fillRect(0, 0, 256, 256);
+    x.strokeStyle = "rgba(30,80,30,0.5)"; x.lineWidth = 4; for (var i = 0; i < 6; i++) { var rx = 20 + i * 42; x.beginPath(); x.moveTo(rx, 0); x.lineTo(rx, 256); x.stroke(); }
+    x.strokeStyle = "#f0f0e0"; x.lineWidth = 2; for (var n = 0; n < 40; n++) { var sx = Math.random() * 256, sy = Math.random() * 256; x.beginPath(); x.moveTo(sx, sy); x.lineTo(sx + (Math.random() * 8 - 4), sy - 8); x.stroke(); }
+    x.fillStyle = "#ff5a8a"; x.beginPath(); x.arc(128, 40, 12, 0, 6.2832); x.fill(); // flower
+    return canvasTex(c);
+  }
+  function buildBurgerTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#e0a850"; x.fillRect(0, 0, 256, 60); // top bun
+    x.fillStyle = "#7bc86a"; x.fillRect(0, 60, 256, 24); // lettuce
+    x.fillStyle = "#e03030"; x.fillRect(0, 84, 256, 20); // tomato
+    x.fillStyle = "#5a3018"; x.fillRect(0, 104, 256, 44); // patty
+    x.fillStyle = "#f0c020"; x.fillRect(0, 148, 256, 16); // cheese
+    x.fillStyle = "#e0a850"; x.fillRect(0, 164, 256, 92); // bottom bun
+    x.fillStyle = "rgba(255,255,255,0.5)"; for (var n = 0; n < 24; n++) x.fillRect(Math.random() * 256, Math.random() * 40, 3, 2); // sesame
+    return canvasTex(c);
+  }
+  function buildUnicornTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    var g = x.createLinearGradient(0, 0, 0, 256); g.addColorStop(0, "#ffd0f0"); g.addColorStop(0.33, "#d0e0ff"); g.addColorStop(0.66, "#d0ffe0"); g.addColorStop(1, "#fff0d0"); x.fillStyle = g; x.fillRect(0, 0, 256, 256);
+    x.fillStyle = "rgba(255,255,255,0.6)"; for (var n = 0; n < 30; n++) { x.save(); x.translate(Math.random() * 256, Math.random() * 256); x.rotate(Math.random() * 3); for (var p = 0; p < 4; p++) { x.rotate(Math.PI / 2); x.fillRect(0, 0, 6, 1.5); } x.restore(); }
+    return canvasTex(c);
+  }
+  function buildChiliTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    var g = x.createLinearGradient(0, 0, 256, 256); g.addColorStop(0, "#ff3020"); g.addColorStop(1, "#a00808"); x.fillStyle = g; x.fillRect(0, 0, 256, 256);
+    var hg = x.createRadialGradient(90, 80, 4, 90, 80, 50); hg.addColorStop(0, "rgba(255,220,200,0.7)"); hg.addColorStop(1, "rgba(255,220,200,0)"); x.fillStyle = hg; x.beginPath(); x.arc(90, 80, 50, 0, 6.2832); x.fill();
+    x.fillStyle = "#2a7a2a"; x.fillRect(112, 0, 32, 40); // green stem
+    return canvasTex(c);
+  }
+  function buildKrakenTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    var g = x.createRadialGradient(128, 100, 20, 128, 128, 170); g.addColorStop(0, "#7a3ad0"); g.addColorStop(1, "#2a0a5a"); x.fillStyle = g; x.fillRect(0, 0, 256, 256);
+    x.fillStyle = "rgba(180,120,255,0.5)"; for (var n = 0; n < 60; n++) { x.beginPath(); x.arc(Math.random() * 256, Math.random() * 256, Math.random() * 4 + 1.5, 0, 6.2832); x.fill(); } // suckers
+    return canvasTex(c);
+  }
+
   // a peel-tinted panel stamped with a big number, for the puzzle banana's
   // "peel in order" challenge (drawn on the strips themselves)
   function buildPuzzleNumberTexture(n) {
@@ -2177,7 +2256,11 @@
     nuke: buildNukeTexture(), soapbubble: buildSoapBubbleTexture(), blizzard: buildBlizzardTexture(),
     theater: buildTheaterTexture(), lotus: buildLotusTexture(), fossil: buildFossilTexture(),
     tsunami: buildTsunamiTexture(), firework: buildFireworkTexture(), trap: buildTrapTexture(),
-    amulet: buildAmuletTexture(), cosmicwhale: buildCosmicWhaleTexture()
+    amulet: buildAmuletTexture(), cosmicwhale: buildCosmicWhaleTexture(),
+    dino: buildDinoTexture(), mushroom: buildMushroomTexture(), chrono: buildChronoTexture(),
+    dice: buildDiceTexture(), butterfly: buildButterflyTexture(), cactus: buildCactusTexture(),
+    burger: buildBurgerTexture(), unicorn: buildUnicornTexture(), chili: buildChiliTexture(),
+    kraken: buildKrakenTexture()
   };
 
   // ---- rarity tiers: each banana rolls one; the inner fruit takes the material.
@@ -2224,6 +2307,36 @@
     { name: "mirror", mult: 15, weight: 0.55, label: "🪞 Mirror Banana",
       core: { physical: true, color: 0xf2f4f6, metalness: 1.0, roughness: 0.02, clearcoat: 1.0, clearcoatRoughness: 0.02,
         emissive: 0x000000, emissiveIntensity: 0, envMapIntensity: 3.0 } },
+    { name: "unicorn", mult: 18, weight: 0.45, label: "🦄 Unicorn Banana", hueShift: true, sparkle: true, horn: true, infectNext: true,
+      core: { physical: true, color: 0xffffff, mapKind: "unicorn", metalness: 0.2, roughness: 0.25,
+        clearcoat: 0.8, clearcoatRoughness: 0.15, emissive: 0xffb0e0, emissiveIntensity: 0.3, envMapIntensity: 1.2 } },
+    { name: "dino", mult: 13, weight: 0.7, label: "🦖 Dino Banana", stomp: true, revealSound: "roar",
+      core: { color: 0xffffff, mapKind: "dino", metalness: 0.0, roughness: 0.5,
+        emissive: 0x0a2a0a, emissiveIntensity: 0.08, envMapIntensity: 0.7 } },
+    { name: "chrono", mult: 12, weight: 0.8, label: "🕰️ Chrono Banana", slowmo: true, pulse: true,
+      core: { physical: true, color: 0xffffff, mapKind: "chrono", metalness: 0.3, roughness: 0.3,
+        clearcoat: 0.5, clearcoatRoughness: 0.25, emissive: 0x2a2418, emissiveIntensity: 0.1, envMapIntensity: 1.0 } },
+    { name: "kraken", mult: 11, weight: 0.9, label: "🐙 Kraken Banana", gooey: true, pulse: true, ink: true,
+      core: { color: 0xffffff, mapKind: "kraken", glowMap: true, metalness: 0.1, roughness: 0.4,
+        emissive: 0x8a3ad0, emissiveIntensity: 0.35, envMapIntensity: 0.8 } },
+    { name: "butterfly", mult: 9, weight: 1.0, label: "🦋 Butterfly Banana", floaty: true, sway: true, breatheAmp: 0.05,
+      core: { physical: true, color: 0xffffff, mapKind: "butterfly", metalness: 0.2, roughness: 0.3,
+        clearcoat: 0.5, clearcoatRoughness: 0.2, emissive: 0x6a3aa0, emissiveIntensity: 0.2, envMapIntensity: 1.1 } },
+    { name: "mushroom", mult: 9, weight: 1.1, label: "🍄 Mushroom Banana", breatheAmp: 0.1, revealSound: "chime",
+      core: { physical: true, color: 0xffffff, mapKind: "mushroom", metalness: 0.0, roughness: 0.4,
+        clearcoat: 0.4, clearcoatRoughness: 0.3, emissive: 0x3a0808, emissiveIntensity: 0.1, envMapIntensity: 0.8 } },
+    { name: "chili", mult: 8, weight: 1.2, label: "🌶️ Chili Banana", spicy: true,
+      core: { physical: true, color: 0xffffff, mapKind: "chili", metalness: 0.0, roughness: 0.15,
+        clearcoat: 0.9, clearcoatRoughness: 0.1, emissive: 0xff2000, emissiveIntensity: 0.4, envMapIntensity: 1.0 } },
+    { name: "dice", mult: 8, weight: 1.2, label: "🎲 Dice Banana", diceRoll: true,
+      core: { physical: true, color: 0xffffff, mapKind: "dice", metalness: 0.0, roughness: 0.3,
+        clearcoat: 0.5, clearcoatRoughness: 0.25, emissive: 0x202020, emissiveIntensity: 0.06, envMapIntensity: 1.0 } },
+    { name: "cactus", mult: 7, weight: 1.3, label: "🌵 Cactus Banana", prickly: true,
+      core: { color: 0xffffff, mapKind: "cactus", metalness: 0.0, roughness: 0.6,
+        emissive: 0x0a2a0a, emissiveIntensity: 0.06, envMapIntensity: 0.6 } },
+    { name: "burger", mult: 5, weight: 1.6, label: "🍔 Burger Banana", chomp: true,
+      core: { color: 0xffffff, mapKind: "burger", metalness: 0.0, roughness: 0.55,
+        emissive: 0x2a1808, emissiveIntensity: 0.06, envMapIntensity: 0.6 } },
     { name: "cosmicwhale", mult: 22, weight: 0.35, label: "🐋 Cosmic Whale Banana", floaty: true, pulse: true, revealSound: "whale",
       core: { color: 0xffffff, mapKind: "cosmicwhale", glowMap: true, metalness: 0.1, roughness: 0.4,
         emissive: 0x6a8cff, emissiveIntensity: 0.5, envMapIntensity: 0.7 } },
@@ -2557,7 +2670,10 @@
     coral: 0xff7a9c, slime: 0x7bff2e, rockstar: 0xff5a20, pirate: 0xe8e4da,
     vangogh: 0xf0c020, nuke: 0xffc400, soapbubble: 0xa0f0ff, blizzard: 0xdfeeff,
     theater: 0xf0d060, lotus: 0xff9ec0, fossil: 0xd8a850, tsunami: 0x2a8ce0,
-    firework: 0xff3b6b, trap: 0xc0c4c8, amulet: 0x3b9bff, cosmicwhale: 0x6a8cff
+    firework: 0xff3b6b, trap: 0xc0c4c8, amulet: 0x3b9bff, cosmicwhale: 0x6a8cff,
+    dino: 0x3fa04a, mushroom: 0xe02020, chrono: 0xe8e0c8, dice: 0xf8f6f0,
+    butterfly: 0xa05aff, cactus: 0x3fa04a, burger: 0xe0a850, unicorn: 0xffb0e0,
+    chili: 0xff3020, kraken: 0x8a3ad0
   };
   RARITIES.forEach(function (r) { r.burstColor = BURST_COLORS[r.name]; });
   var cheatQueue = null; // null = off; otherwise the still-locked tiers left to hand out
@@ -2652,6 +2768,15 @@
       crown.position.copy(root).addScaledVector(negT0, 0.3);
       crown.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), negT0);
       group.add(crown);
+    }
+    // the unicorn wears a spiral golden horn on its tip
+    if (rarity && rarity.horn) {
+      var hornMat = mat({ color: 0xffe066, metalness: 0.9, roughness: 0.2, emissive: 0x604000, emissiveIntensity: 0.2, envMapIntensity: 1.6 });
+      var horn = new THREE.Mesh(new THREE.ConeGeometry(0.11, 0.5, 12), hornMat);
+      var tipT = frameAt(1).T;
+      horn.position.copy(tip).addScaledVector(tipT, 0.28);
+      horn.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), tipT);
+      group.add(horn);
     }
 
     // saturn wears a tilted, slowly-spinning planetary ring around its middle
@@ -2907,7 +3032,11 @@
     cosmicwhale:{ color: 0xbfd8ff, dir: 0, spread: 0.65, speed: 0.05, life: 2.6, size: 0.05, wobble: true },// star drift
     firework:  { color: 0xffd0a0, dir: 1, spread: 0.4, speed: 0.5, life: 0.8, size: 0.05 },                // sparks
     thermal:   { color: 0xff5030, dir: 1, spread: 0.4, speed: 0.35, life: 1.2, size: 0.05, wobble: true }, // heat shimmer
-    lotus:     { color: 0xffd0e8, dir: 1, spread: 0.5, speed: 0.08, life: 2.4, size: 0.05, wobble: true }  // serene petals
+    lotus:     { color: 0xffd0e8, dir: 1, spread: 0.5, speed: 0.08, life: 2.4, size: 0.05, wobble: true }, // serene petals
+    mushroom:  { color: 0xd8f0a0, dir: 1, spread: 0.45, speed: 0.18, life: 1.8, size: 0.05, wobble: true }, // spores
+    butterfly: { color: 0xffb0e8, dir: 1, spread: 0.6, speed: 0.12, life: 2.2, size: 0.05, wobble: true }, // wing dust
+    cactus:    { color: 0xf0f0e0, dir: 0, spread: 0.55, speed: 0.05, life: 2.0, size: 0.04 },              // floating spines
+    kraken:    { color: 0x5a2a9a, dir: 0, spread: 0.6, speed: 0.25, life: 1.6, size: 0.06, wobble: true }  // ink drift
   };
 
   function respawnAmbient(i, cfg, center) {
@@ -3369,6 +3498,17 @@
     g.gain.setValueAtTime(0.14, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
     o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t + 0.15);
   }
+  // a wet chomp/bite for the burger banana
+  function playChomp() {
+    var ctx = ensureAudio(); if (!ctx) return;
+    var t = ctx.currentTime;
+    var o = ctx.createOscillator(); o.type = "sawtooth";
+    o.frequency.setValueAtTime(240, t); o.frequency.exponentialRampToValueAtTime(70, t + 0.12);
+    var lp = ctx.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 800;
+    var g = ctx.createGain();
+    g.gain.setValueAtTime(0.22, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
+    o.connect(lp); lp.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t + 0.15);
+  }
   function buzz(pattern) {
     try { if (navigator.vibrate) navigator.vibrate(pattern); } catch (e) {}
   }
@@ -3404,6 +3544,11 @@
       drag = { mode: "peel", strip: strip, startX: p.px, startY: p.py, lastDist: 0, nextRip: 0.06, nextZest: 30 };
       ensureAudio(); // unlock audio on the first user gesture
       kickWobble(0.5); // the fruit jiggles when you grab a peel
+      // cactus: grabbing a spiny strip pricks you — sharp haptic + a spike puff
+      if (current.rarity && current.rarity.prickly) {
+        buzz([8, 20, 8, 20, 8]); playBlipShort();
+        zestSpray(p.px, p.py);
+      }
       hint.style.opacity = "0";
       if (!started) { started = true; bananaStart = performance.now(); }
     } else {
@@ -3529,6 +3674,8 @@
       playRiff(stripIdx);
     } else if (current.rarity && current.rarity.arcade) {
       playArcadeNote(stripIdx);
+    } else if (current.rarity && current.rarity.chomp) {
+      playChomp();
     } else {
       playRip(1, true); // the final tear as the strip comes free
     }
@@ -3727,6 +3874,15 @@
         // amulet: a protective floor — the bonus can never come out puny
         var floorBonus = 50 * rr.mult;
         if (bonus < floorBonus) { bonus = floorBonus; bonusTag += " 🪬 Warded"; }
+      }
+      if (rr && rr.diceRoll) {
+        // dice: the completion bonus is multiplied by a rolled 1-6
+        var roll = 1 + (Math.random() * 6 | 0);
+        bonus *= roll; bonusTag += " 🎲×" + roll; playReels();
+      }
+      if (rr && rr.spicy && started && bananaElapsed < 4) {
+        // chili: peel it before the heat builds for a "cooled off" bonus
+        bonus += 160; bonusTag += " 🌶️ Cooled!";
       }
       // phoenix: its own completion doesn't end the streak — the combo carries
       // into whatever spawns next instead of expiring on the usual timer
@@ -4139,6 +4295,21 @@
         current.coreMat.emissiveIntensity = 0.08 + mood * 0.5;
         current.coreMat.emissive.setHSL(0.13, 0.7, 0.3 + mood * 0.25);
       }
+      // chili: the heat (red glow) intensifies the longer it goes unpeeled
+      if (rq.spicy && started) {
+        current.coreMat.emissiveIntensity = 0.4 + Math.min(1.3, bananaElapsed / 8 * 1.3);
+      }
+      // dino: periodic ground-shaking stomp
+      if (rq.stomp) {
+        current.scareTimer += dt;
+        if (current.scareTimer > 2.4) {
+          current.scareTimer = 0;
+          playThud();
+          stageWrap.classList.remove("shake"); void stageWrap.offsetWidth; stageWrap.classList.add("shake");
+          setTimeout(function () { stageWrap.classList.remove("shake"); }, 350);
+          buzz([70]);
+        }
+      }
     }
     updateAmbient(dt, now);
 
@@ -4158,12 +4329,15 @@
         if (!drag) g.rotation.y += (0 - g.rotation.y) * Math.min(1, 2.0 * dt);
       } else {
         var spin = (current.rarity && current.rarity.discoSpin) ? AUTO_SPIN * 5
-          : (current.rarity && current.rarity.heavy) ? AUTO_SPIN * 0.35 : AUTO_SPIN;
+          : (current.rarity && current.rarity.heavy) ? AUTO_SPIN * 0.35
+          : (current.rarity && current.rarity.slowmo) ? AUTO_SPIN * 0.15 : AUTO_SPIN;
         if (!drag) g.rotation.y += spin * dt;
       }
-      // the dream banana floats higher and bobs on bigger, slower swells
+      // the dream banana floats higher and bobs on bigger, slower swells;
+      // chrono's bullet-time slows its bob to a crawl too
       var floaty = current.rarity && current.rarity.floaty;
-      g.position.y = BASE_Y + (floaty ? 0.35 : 0) + Math.sin(now * 0.0018) * (floaty ? BOB_AMP * 3 : BOB_AMP);
+      var bobRate = (current.rarity && current.rarity.slowmo) ? 0.0004 : 0.0018;
+      g.position.y = BASE_Y + (floaty ? 0.35 : 0) + Math.sin(now * bobRate) * (floaty ? BOB_AMP * 3 : BOB_AMP);
       // the comet slowly falls, picking up speed the longer you take
       if (current.rarity && current.rarity.falling) {
         var fallT = (now - current.chargeStart) / 1000;
