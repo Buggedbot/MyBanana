@@ -342,7 +342,7 @@
     <div id="flash"></div>
     <div id="progress-bar"><div id="progress-fill"></div></div>
   </div>
-  <footer>Peel fast to chain combos · collect all 160 rare bananas</footer>
+  <footer>Peel fast to chain combos · collect all 215 rare bananas</footer>
   <div id="collection">
     <div class="col-card">
       <h2>📖 Collection <span id="col-progress"></span></h2>
@@ -2521,6 +2521,454 @@
     x.fillStyle = "rgba(255,230,170,0.7)"; for (var n = 0; n < 30; n++) x.fillRect(Math.random() * 256, Math.random() * 256, 3, 2); // buttery flakes
     return canvasTex(c);
   }
+  function buildBobaTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    var g = x.createLinearGradient(0, 0, 0, 256); g.addColorStop(0, "#e8d0b8"); g.addColorStop(1, "#c8a078"); x.fillStyle = g; x.fillRect(0, 0, 256, 256); // milk tea
+    x.fillStyle = "#2a1a12"; for (var n = 0; n < 22; n++) { x.beginPath(); x.arc(Math.random() * 256, 150 + Math.random() * 106, 9 + Math.random() * 4, 0, 6.2832); x.fill(); } // pearls settle low
+    x.fillStyle = "#ff8cc0"; x.fillRect(118, 0, 20, 90); // straw
+    return canvasTex(c);
+  }
+  function buildY2kTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    var g = x.createLinearGradient(0, 0, 256, 256); g.addColorStop(0, "#d8e8f8"); g.addColorStop(0.4, "#8898b0"); g.addColorStop(0.6, "#e8f0f8"); g.addColorStop(1, "#98a8c0"); x.fillStyle = g; x.fillRect(0, 0, 256, 256); // chrome
+    x.fillStyle = "rgba(255,120,220,0.5)"; for (var n = 0; n < 8; n++) { x.beginPath(); x.ellipse(Math.random() * 256, Math.random() * 256, 26, 12, Math.random() * 3, 0, 6.2832); x.fill(); } // pink chrome blobs
+    x.fillStyle = "#ffffff"; for (var s = 0; s < 12; s++) { x.save(); x.translate(Math.random() * 256, Math.random() * 256); for (var p = 0; p < 4; p++) { x.rotate(Math.PI / 2); x.fillRect(0, 0, 8, 1.6); } x.restore(); } // starbursts
+    return canvasTex(c);
+  }
+  function buildCottagecoreTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#f4ecd8"; x.fillRect(0, 0, 256, 256);
+    x.fillStyle = "rgba(200,160,120,0.25)"; for (var gi = 0; gi < 8; gi++) { x.fillRect(gi * 32, 0, 16, 256); x.fillRect(0, gi * 32, 256, 16); } // gingham
+    for (var f = 0; f < 10; f++) { var fx2 = Math.random() * 256, fy = Math.random() * 256; x.fillStyle = "#e08898"; for (var p = 0; p < 5; p++) { var a = p * 1.256; x.beginPath(); x.ellipse(fx2 + Math.cos(a) * 7, fy + Math.sin(a) * 7, 5, 3, a, 0, 6.2832); x.fill(); } x.fillStyle = "#f0c040"; x.beginPath(); x.arc(fx2, fy, 3.5, 0, 6.2832); x.fill(); } // daisies
+    return canvasTex(c);
+  }
+  function buildGothTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#16121a"; x.fillRect(0, 0, 256, 256);
+    x.strokeStyle = "rgba(120,100,140,0.4)"; x.lineWidth = 2;
+    for (var n = 0; n < 8; n++) { var sy = n * 34; x.beginPath(); for (var sx = 0; sx <= 256; sx += 16) { x.arc(sx, sy, 8, 0, Math.PI); } x.stroke(); } // lace scallops
+    x.fillStyle = "#c8ccd4"; x.fillRect(120, 90, 16, 60); x.fillRect(103, 106, 50, 15); // silver cross
+    return canvasTex(c);
+  }
+  function buildBarbieTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    var g = x.createLinearGradient(0, 0, 0, 256); g.addColorStop(0, "#ff5fae"); g.addColorStop(1, "#e0308a"); x.fillStyle = g; x.fillRect(0, 0, 256, 256);
+    x.fillStyle = "rgba(255,255,255,0.75)"; for (var n = 0; n < 60; n++) { x.beginPath(); x.arc(Math.random() * 256, Math.random() * 256, Math.random() * 2 + 0.6, 0, 6.2832); x.fill(); } // glitter
+    x.fillStyle = "rgba(255,220,240,0.8)"; x.beginPath(); x.ellipse(70, 60, 30, 14, -0.5, 0, 6.2832); x.fill(); // gloss shine
+    return canvasTex(c);
+  }
+  function buildVaporwaveTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    var g = x.createLinearGradient(0, 0, 0, 256); g.addColorStop(0, "#2a1a5a"); g.addColorStop(0.55, "#ff6ab0"); g.addColorStop(1, "#ffb060"); x.fillStyle = g; x.fillRect(0, 0, 256, 256); // sunset
+    x.fillStyle = "#f0d060"; x.beginPath(); x.arc(128, 110, 46, 0, 6.2832); x.fill();
+    x.fillStyle = "rgba(42,26,90,1)"; for (var b = 0; b < 5; b++) x.fillRect(82, 96 + b * 12, 92, 5); // banded sun
+    x.strokeStyle = "rgba(80,240,255,0.7)"; x.lineWidth = 2;
+    for (var v = 0; v < 7; v++) { x.beginPath(); x.moveTo(128 + (v - 3) * 14, 160); x.lineTo(128 + (v - 3) * 60, 256); x.stroke(); }
+    for (var h = 0; h < 5; h++) { x.beginPath(); x.moveTo(0, 168 + h * 22); x.lineTo(256, 168 + h * 22); x.stroke(); } // the grid
+    return canvasTex(c);
+  }
+  function buildVhsTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#101014"; x.fillRect(0, 0, 256, 256);
+    for (var n = 0; n < 128; n++) { x.fillStyle = "rgba(" + (Math.random() * 90 + 40 | 0) + "," + (Math.random() * 90 + 40 | 0) + "," + (Math.random() * 90 + 40 | 0) + ",0.5)"; x.fillRect(0, n * 2, 256, 1); } // static scanlines
+    x.fillStyle = "#ff3050"; x.fillRect(18, 20, 10, 10); x.fillStyle = "#f0f0f0"; x.font = "bold 22px monospace"; x.fillText("REC", 36, 32); x.fillText("PLAY ▶", 18, 236);
+    return canvasTex(c);
+  }
+  function buildAvocadoTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    var g = x.createRadialGradient(128, 128, 20, 128, 128, 170); g.addColorStop(0, "#d8e890"); g.addColorStop(0.7, "#8ab84a"); g.addColorStop(1, "#3a5a1a"); x.fillStyle = g; x.fillRect(0, 0, 256, 256);
+    var pg = x.createRadialGradient(118, 118, 6, 128, 128, 52); pg.addColorStop(0, "#c89058"); pg.addColorStop(1, "#7a4a20"); x.fillStyle = pg; x.beginPath(); x.arc(128, 128, 52, 0, 6.2832); x.fill(); // the pit
+    return canvasTex(c);
+  }
+  function buildJuiceboxTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#ff9a30"; x.fillRect(0, 0, 256, 256);
+    x.fillStyle = "#ffffff"; x.fillRect(30, 60, 196, 120);
+    x.fillStyle = "#ff9a30"; x.font = "bold 34px sans-serif"; x.fillText("JUICE", 68, 116); x.font = "16px sans-serif"; x.fillText("100% banana", 70, 150);
+    x.fillStyle = "#f0f0f0"; x.fillRect(196, 8, 14, 46); x.fillStyle = "#c8c8d0"; x.fillRect(196, 8, 14, 10); // straw
+    return canvasTex(c);
+  }
+  function buildStrawmilkTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#ffd8e4"; x.fillRect(0, 0, 256, 256);
+    x.fillStyle = "rgba(255,90,140,0.4)"; for (var n = 0; n < 30; n++) { x.beginPath(); x.arc(Math.random() * 256, Math.random() * 256, 4 + Math.random() * 8, 0, 6.2832); x.fill(); } // strawberry swirl spots
+    x.fillStyle = "#e83060"; for (var s = 0; s < 12; s++) { x.save(); x.translate(Math.random() * 256, Math.random() * 256); x.rotate(Math.random() * 3); x.beginPath(); x.ellipse(0, 0, 2, 3.4, 0, 0, 6.2832); x.fill(); x.restore(); } // seeds
+    return canvasTex(c);
+  }
+  function buildTacoTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#f0c060"; x.fillRect(0, 0, 256, 256); // shell
+    x.fillStyle = "rgba(200,140,50,0.5)"; for (var n = 0; n < 40; n++) x.fillRect(Math.random() * 256, Math.random() * 256, 4, 3); // toast marks
+    x.fillStyle = "#7a4a20"; x.fillRect(0, 96, 256, 30); // beef
+    x.fillStyle = "#7bc86a"; for (var l = 0; l < 14; l++) x.fillRect(l * 20, 84, 14, 12); // lettuce fringe
+    x.fillStyle = "#e83030"; for (var t = 0; t < 8; t++) { x.beginPath(); x.arc(t * 34 + 16, 132, 7, 0, 6.2832); x.fill(); } // tomato
+    x.fillStyle = "#ffd23f"; for (var ch = 0; ch < 12; ch++) x.fillRect(ch * 22, 142, 12, 5); // cheese
+    return canvasTex(c);
+  }
+  function buildDumplingTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#f0e4d0"; x.fillRect(0, 0, 256, 256);
+    x.strokeStyle = "rgba(180,150,110,0.6)"; x.lineWidth = 4;
+    for (var p = 0; p < 8; p++) { x.beginPath(); x.moveTo(p * 34, 0); x.quadraticCurveTo(p * 34 + 20, 128, p * 34, 256); x.stroke(); } // pleats
+    x.fillStyle = "rgba(220,180,130,0.4)"; x.beginPath(); x.ellipse(128, 200, 90, 30, 0, 0, 6.2832); x.fill(); // steamed base blush
+    return canvasTex(c);
+  }
+  function buildMatchaTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    var g = x.createLinearGradient(0, 0, 0, 256); g.addColorStop(0, "#c8dCA0"); g.addColorStop(1, "#7a9a4a"); x.fillStyle = g; x.fillRect(0, 0, 256, 256);
+    x.strokeStyle = "rgba(255,250,235,0.7)"; x.lineWidth = 8; x.beginPath();
+    for (var a = 0; a < 12; a += 0.1) { var rr = a * 9; var px = 128 + Math.cos(a) * rr, py = 128 + Math.sin(a) * rr * 0.7; if (a === 0) x.moveTo(px, py); else x.lineTo(px, py); } x.stroke(); // latte-art swirl
+    return canvasTex(c);
+  }
+  function buildSkeletonTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#1a1a20"; x.fillRect(0, 0, 256, 256);
+    x.fillStyle = "#e8e4d8";
+    for (var r = 0; r < 6; r++) { x.beginPath(); if (x.roundRect) x.roundRect(30, r * 42 + 10, 196, 22, 11); else x.rect(30, r * 42 + 10, 196, 22); x.fill(); } // rib bones
+    x.fillStyle = "#1a1a20"; for (var r2 = 0; r2 < 6; r2++) { x.beginPath(); x.arc(128, r2 * 42 + 21, 6, 0, 6.2832); x.fill(); } // vertebra gaps
+    return canvasTex(c);
+  }
+  function buildGamerTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#0c0c14"; x.fillRect(0, 0, 256, 256);
+    for (var k = 0; k < 6; k++) for (var q = 0; q < 6; q++) {
+      x.fillStyle = "hsl(" + ((k + q) * 30 % 360) + ",90%,55%)";
+      x.beginPath(); if (x.roundRect) x.roundRect(q * 42 + 8, k * 42 + 8, 32, 32, 6); else x.rect(q * 42 + 8, k * 42 + 8, 32, 32); x.fill();
+      x.fillStyle = "rgba(0,0,0,0.55)"; x.beginPath(); if (x.roundRect) x.roundRect(q * 42 + 11, k * 42 + 11, 26, 26, 5); else x.rect(q * 42 + 11, k * 42 + 11, 26, 26); x.fill(); // RGB keycaps
+    }
+    return canvasTex(c);
+  }
+  function buildFloppyTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#2a2a6a"; x.fillRect(0, 0, 256, 256);
+    x.fillStyle = "#c8ccd4"; x.fillRect(70, 6, 116, 74); x.fillStyle = "#2a2a6a"; x.fillRect(120, 16, 34, 54); // shutter
+    x.fillStyle = "#f0f0e8"; x.fillRect(40, 130, 176, 100);
+    x.strokeStyle = "#a0a0a8"; x.lineWidth = 2; for (var l = 0; l < 4; l++) { x.beginPath(); x.moveTo(52, 156 + l * 20); x.lineTo(204, 156 + l * 20); x.stroke(); } // label lines
+    x.fillStyle = "#2a2a6a"; x.font = "bold 15px monospace"; x.fillText("BANANA.EXE", 60, 150);
+    return canvasTex(c);
+  }
+  function buildSkaterTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#222226"; x.fillRect(0, 0, 256, 256);
+    x.fillStyle = "rgba(255,255,255,0.12)"; for (var n = 0; n < 500; n++) x.fillRect(Math.random() * 256, Math.random() * 256, 1.5, 1.5); // grip tape
+    x.fillStyle = "#ff5a20"; x.beginPath(); x.arc(70, 80, 30, 0, 6.2832); x.fill(); x.fillStyle = "#fff"; x.font = "bold 15px sans-serif"; x.fillText("SK8", 55, 86); // sticker
+    x.fillStyle = "#3b9bff"; x.save(); x.translate(180, 180); x.rotate(-0.4); x.fillRect(-38, -14, 76, 28); x.fillStyle = "#fff"; x.font = "bold 13px sans-serif"; x.fillText("RIPE", -18, 5); x.restore(); // sticker
+    return canvasTex(c);
+  }
+  function buildTeddyTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#b8845a"; x.fillRect(0, 0, 256, 256);
+    x.strokeStyle = "rgba(140,90,50,0.5)"; x.lineWidth = 2;
+    for (var n = 0; n < 120; n++) { var sx = Math.random() * 256, sy = Math.random() * 256; x.beginPath(); x.moveTo(sx, sy); x.lineTo(sx + 3, sy + 8); x.stroke(); } // plush fur
+    x.fillStyle = "#e8d8c0"; x.beginPath(); x.ellipse(128, 170, 40, 28, 0, 0, 6.2832); x.fill(); // belly patch
+    x.strokeStyle = "#4a3018"; x.lineWidth = 3; x.setLineDash([7, 5]); x.beginPath(); x.ellipse(128, 170, 40, 28, 0, 0, 6.2832); x.stroke(); x.setLineDash([]); // stitching
+    return canvasTex(c);
+  }
+  function buildKawaiiTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#ffe8f0"; x.fillRect(0, 0, 256, 256);
+    x.fillStyle = "#2a2a2a"; x.beginPath(); x.arc(92, 110, 9, 0, 6.2832); x.fill(); x.beginPath(); x.arc(164, 110, 9, 0, 6.2832); x.fill(); // eyes
+    x.strokeStyle = "#2a2a2a"; x.lineWidth = 5; x.beginPath(); x.arc(128, 128, 18, 0.4, Math.PI - 0.4); x.stroke(); // smile
+    x.fillStyle = "rgba(255,120,160,0.6)"; x.beginPath(); x.ellipse(74, 138, 13, 8, 0, 0, 6.2832); x.fill(); x.beginPath(); x.ellipse(182, 138, 13, 8, 0, 0, 6.2832); x.fill(); // blush
+    x.fillStyle = "#ffd23f"; for (var s = 0; s < 8; s++) { x.save(); x.translate(Math.random() * 256, Math.random() * 60 + (Math.random() > 0.5 ? 0 : 190)); for (var p = 0; p < 4; p++) { x.rotate(Math.PI / 2); x.fillRect(0, 0, 7, 1.6); } x.restore(); } // sparkles
+    return canvasTex(c);
+  }
+  function buildPrideTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    var cols = ["#e40303", "#ff8c00", "#ffed00", "#008026", "#24408e", "#732982"];
+    for (var s = 0; s < 6; s++) { x.fillStyle = cols[s]; x.fillRect(0, s * 43, 256, 44); }
+    x.fillStyle = "rgba(255,255,255,0.25)"; for (var n = 0; n < 26; n++) { x.beginPath(); x.arc(Math.random() * 256, Math.random() * 256, Math.random() * 2.4 + 0.8, 0, 6.2832); x.fill(); } // shimmer
+    return canvasTex(c);
+  }
+  function buildBlingTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    var g = x.createLinearGradient(0, 0, 256, 256); g.addColorStop(0, "#d8dee8"); g.addColorStop(0.5, "#f8fafc"); g.addColorStop(1, "#b0b8c8"); x.fillStyle = g; x.fillRect(0, 0, 256, 256); // chrome
+    for (var n = 0; n < 30; n++) { var sx = Math.random() * 256, sy = Math.random() * 256; x.fillStyle = "#bfe8ff"; x.save(); x.translate(sx, sy); x.rotate(0.785); x.fillRect(-6, -6, 12, 12); x.restore(); x.fillStyle = "rgba(255,255,255,0.95)"; x.fillRect(sx - 1, sy - 5, 2, 10); x.fillRect(sx - 5, sy - 1, 10, 2); } // set stones
+    return canvasTex(c);
+  }
+  function buildMoneyTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#9ab88a"; x.fillRect(0, 0, 256, 256);
+    x.strokeStyle = "#4a6a3a"; x.lineWidth = 3; x.strokeRect(12, 12, 232, 232); x.strokeRect(22, 22, 212, 212); // bill borders
+    x.fillStyle = "#dce8d0"; x.beginPath(); x.arc(128, 128, 56, 0, 6.2832); x.fill(); x.strokeStyle = "#4a6a3a"; x.stroke();
+    x.fillStyle = "#4a6a3a"; x.font = "bold 64px serif"; x.fillText("$", 108, 150); x.font = "bold 22px serif"; x.fillText("100", 30, 48); x.fillText("100", 190, 232);
+    return canvasTex(c);
+  }
+  function buildMatrixTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#020a04"; x.fillRect(0, 0, 256, 256);
+    x.font = "bold 15px monospace";
+    for (var col = 0; col < 14; col++) { var len = 4 + Math.random() * 12 | 0, top = Math.random() * 100; for (var ch = 0; ch < len; ch++) { x.fillStyle = ch === len - 1 ? "#d8ffd8" : "rgba(20,220,70," + (1 - ch / len * 0.7) + ")"; x.fillText(String.fromCharCode(0x30a0 + Math.random() * 90 | 0), col * 18 + 4, top + ch * 16); } } // digital rain
+    return canvasTex(c);
+  }
+  function buildMeltingTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    var g = x.createLinearGradient(0, 0, 0, 256); g.addColorStop(0, "#ffd23f"); g.addColorStop(1, "#ff8c2e"); x.fillStyle = g; x.fillRect(0, 0, 256, 256);
+    x.fillStyle = "#e86820"; for (var d = 0; d < 8; d++) { var dx = d * 34 + 12, dl = 40 + Math.random() * 120; x.fillRect(dx, 0, 18, dl); x.beginPath(); x.arc(dx + 9, dl, 9, 0, 6.2832); x.fill(); } // long drips
+    x.fillStyle = "#2a2a2a"; x.beginPath(); x.arc(86, 60, 7, 0, 6.2832); x.fill(); x.beginPath(); x.arc(150, 60, 7, 0, 6.2832); x.fill();
+    x.strokeStyle = "#2a2a2a"; x.lineWidth = 4; x.beginPath(); x.arc(118, 92, 14, Math.PI * 1.15, Math.PI * 1.85, true); x.stroke(); // droopy face
+    return canvasTex(c);
+  }
+  function buildFlamingoTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    var g = x.createLinearGradient(0, 0, 0, 256); g.addColorStop(0, "#ff9ab8"); g.addColorStop(1, "#f06890"); x.fillStyle = g; x.fillRect(0, 0, 256, 256);
+    x.strokeStyle = "rgba(255,255,255,0.45)"; x.lineWidth = 3;
+    for (var n = 0; n < 40; n++) { var sx = Math.random() * 256, sy = Math.random() * 256; x.beginPath(); x.moveTo(sx, sy); x.quadraticCurveTo(sx + 10, sy - 8, sx + 22, sy - 2); x.stroke(); } // feather curls
+    return canvasTex(c);
+  }
+  function buildKiwiTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    var g = x.createRadialGradient(128, 128, 12, 128, 128, 170); g.addColorStop(0, "#e8f0c0"); g.addColorStop(0.25, "#a8d048"); g.addColorStop(1, "#5a8a20"); x.fillStyle = g; x.fillRect(0, 0, 256, 256);
+    x.fillStyle = "#1a1a10"; for (var a = 0; a < 6.2832; a += 0.32) { for (var rr = 44; rr <= 66; rr += 20) { x.save(); x.translate(128 + Math.cos(a) * rr, 128 + Math.sin(a) * rr); x.rotate(a); x.beginPath(); x.ellipse(0, 0, 2, 4, 0, 0, 6.2832); x.fill(); x.restore(); } } // seed ring
+    return canvasTex(c);
+  }
+  function buildBlueberryTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    var g = x.createRadialGradient(100, 90, 20, 128, 128, 180); g.addColorStop(0, "#7a86e8"); g.addColorStop(1, "#2a2a7a"); x.fillStyle = g; x.fillRect(0, 0, 256, 256);
+    x.fillStyle = "rgba(200,210,255,0.35)"; for (var n = 0; n < 26; n++) { x.beginPath(); x.arc(Math.random() * 256, Math.random() * 256, 3 + Math.random() * 5, 0, 6.2832); x.fill(); } // bloom dust
+    return canvasTex(c);
+  }
+  function buildToastTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#e8c088"; x.fillRect(0, 0, 256, 256);
+    x.fillStyle = "#a8702e"; x.fillRect(0, 0, 256, 22); x.fillRect(0, 234, 256, 22); x.fillRect(0, 0, 22, 256); x.fillRect(234, 0, 22, 256); // crust
+    x.fillStyle = "#f0d060"; x.beginPath(); if (x.roundRect) x.roundRect(88, 88, 80, 80, 14); else x.rect(88, 88, 80, 80); x.fill(); // butter pat
+    x.fillStyle = "rgba(160,100,40,0.35)"; for (var n = 0; n < 40; n++) x.fillRect(Math.random() * 200 + 28, Math.random() * 200 + 28, 4, 3); // toasting
+    return canvasTex(c);
+  }
+  function buildWaffleTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#e8a850"; x.fillRect(0, 0, 256, 256);
+    x.fillStyle = "rgba(140,80,20,0.55)"; for (var gi = 0; gi < 5; gi++) { x.fillRect(gi * 52 + 14, 0, 26, 256); x.fillRect(0, gi * 52 + 14, 256, 26); } // deep grid pockets
+    x.fillStyle = "rgba(160,80,20,0.75)"; x.fillRect(0, 0, 256, 40); // syrup edge
+    return canvasTex(c);
+  }
+  function buildLofiTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    var g = x.createLinearGradient(0, 0, 0, 256); g.addColorStop(0, "#4a3a6a"); g.addColorStop(1, "#8a5a7a"); x.fillStyle = g; x.fillRect(0, 0, 256, 256); // dusk window
+    x.fillStyle = "#f0d090"; x.fillRect(150, 40, 60, 60); // warm window
+    x.strokeStyle = "#2a2040"; x.lineWidth = 5; x.strokeRect(150, 40, 60, 60); x.beginPath(); x.moveTo(180, 40); x.lineTo(180, 100); x.stroke();
+    x.strokeStyle = "rgba(200,210,255,0.4)"; x.lineWidth = 2; for (var r = 0; r < 24; r++) { var sx = Math.random() * 256, sy = Math.random() * 256; x.beginPath(); x.moveTo(sx, sy); x.lineTo(sx - 3, sy + 14); x.stroke(); } // rain streaks
+    x.fillStyle = "#2a2040"; x.fillRect(30, 170, 90, 55); x.fillStyle = "#e05a80"; x.beginPath(); x.arc(52, 197, 12, 0, 6.2832); x.fill(); x.beginPath(); x.arc(98, 197, 12, 0, 6.2832); x.fill(); // headphones
+    return canvasTex(c);
+  }
+  function buildRocketTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#f0f2f4"; x.fillRect(0, 0, 256, 256); // hull
+    x.fillStyle = "#e03030"; x.fillRect(0, 0, 256, 40); x.beginPath(); x.moveTo(0, 256); x.lineTo(64, 190); x.lineTo(64, 256); x.closePath(); x.fill(); x.beginPath(); x.moveTo(256, 256); x.lineTo(192, 190); x.lineTo(192, 256); x.closePath(); x.fill(); // nose band + fins
+    x.fillStyle = "#3b9bff"; x.beginPath(); x.arc(128, 110, 30, 0, 6.2832); x.fill(); x.strokeStyle = "#a0a8b0"; x.lineWidth = 6; x.stroke(); // porthole
+    x.fillStyle = "#1a1a2a"; x.font = "bold 20px sans-serif"; x.fillText("NANA-1", 92, 176);
+    return canvasTex(c);
+  }
+  function buildDoomscrollTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#101018"; x.fillRect(0, 0, 256, 256);
+    for (var p = 0; p < 5; p++) { var py = p * 54 + 8; x.fillStyle = "#22222e"; x.beginPath(); if (x.roundRect) x.roundRect(12, py, 232, 44, 8); else x.rect(12, py, 232, 44); x.fill(); x.fillStyle = "#3a3a4a"; x.beginPath(); x.arc(36, py + 22, 13, 0, 6.2832); x.fill(); x.fillRect(60, py + 10, 130, 8); x.fillRect(60, py + 26, 170, 8); } // endless feed cards
+    x.fillStyle = "#ff3050"; x.beginPath(); x.arc(224, 30, 9, 0, 6.2832); x.fill(); x.fillStyle = "#fff"; x.font = "bold 12px sans-serif"; x.fillText("99+", 214, 34); // notifications
+    return canvasTex(c);
+  }
+  function buildMechaTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#7a828c"; x.fillRect(0, 0, 256, 256);
+    x.strokeStyle = "#3a4048"; x.lineWidth = 4; x.strokeRect(10, 10, 110, 110); x.strokeRect(136, 10, 110, 70); x.strokeRect(10, 136, 70, 110); x.strokeRect(96, 96, 150, 150); // armor panels
+    x.fillStyle = "#f0c020"; for (var w = 0; w < 6; w++) { x.save(); x.translate(140 + w * 18, 120); x.rotate(0.785); x.fillRect(0, 0, 12, 12); x.restore(); } // hazard chevrons
+    x.fillStyle = "#3ce080"; x.beginPath(); x.arc(48, 190, 14, 0, 6.2832); x.fill(); // power core
+    return canvasTex(c);
+  }
+  function buildPeachTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    var g = x.createRadialGradient(90, 90, 20, 128, 128, 180); g.addColorStop(0, "#ffd8a0"); g.addColorStop(0.6, "#ff9a70"); g.addColorStop(1, "#e86080"); x.fillStyle = g; x.fillRect(0, 0, 256, 256);
+    x.strokeStyle = "rgba(200,80,90,0.5)"; x.lineWidth = 5; x.beginPath(); x.moveTo(128, 10); x.quadraticCurveTo(150, 128, 128, 246); x.stroke(); // cleft
+    x.fillStyle = "#5a8a3a"; x.beginPath(); x.ellipse(150, 26, 22, 9, 0.5, 0, 6.2832); x.fill(); // leaf
+    return canvasTex(c);
+  }
+  function buildMangoTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    var g = x.createLinearGradient(0, 0, 256, 256); g.addColorStop(0, "#ffc030"); g.addColorStop(0.6, "#ff8c2e"); g.addColorStop(1, "#e84a3a"); x.fillStyle = g; x.fillRect(0, 0, 256, 256);
+    x.fillStyle = "rgba(255,230,140,0.5)"; for (var n = 0; n < 26; n++) { x.beginPath(); x.arc(Math.random() * 256, Math.random() * 256, 2 + Math.random() * 3, 0, 6.2832); x.fill(); } // sugar freckles
+    return canvasTex(c);
+  }
+  function buildFairyTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    var g = x.createLinearGradient(0, 0, 256, 256); g.addColorStop(0, "#d8f0e0"); g.addColorStop(0.5, "#c0d8ff"); g.addColorStop(1, "#ecd0ff"); x.fillStyle = g; x.fillRect(0, 0, 256, 256);
+    x.strokeStyle = "rgba(255,255,255,0.65)"; x.lineWidth = 2;
+    for (var w = 0; w < 6; w++) { var wx = Math.random() * 256, wy = Math.random() * 256; x.beginPath(); x.ellipse(wx, wy, 24, 11, Math.random() * 3, 0, 6.2832); x.stroke(); x.beginPath(); x.ellipse(wx + 10, wy + 6, 16, 8, Math.random() * 3, 0, 6.2832); x.stroke(); } // wing pairs
+    x.fillStyle = "#fff"; for (var n = 0; n < 40; n++) { x.beginPath(); x.arc(Math.random() * 256, Math.random() * 256, Math.random() * 1.6 + 0.4, 0, 6.2832); x.fill(); } // pixie dust
+    return canvasTex(c);
+  }
+  function buildChessTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    for (var r = 0; r < 8; r++) for (var q = 0; q < 8; q++) { x.fillStyle = (r + q) % 2 ? "#3a3028" : "#e8dcc8"; x.fillRect(q * 32, r * 32, 32, 32); }
+    x.fillStyle = "#3a3028"; x.font = "bold 30px serif"; x.fillText("♞", 78, 120); x.fillStyle = "#e8dcc8"; x.fillText("♛", 150, 200);
+    return canvasTex(c);
+  }
+  function buildSlothTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#a89068"; x.fillRect(0, 0, 256, 256);
+    x.strokeStyle = "rgba(120,95,60,0.5)"; x.lineWidth = 3;
+    for (var n = 0; n < 70; n++) { var sx = Math.random() * 256, sy = Math.random() * 256; x.beginPath(); x.moveTo(sx, sy); x.lineTo(sx + 2, sy + 18); x.stroke(); } // shaggy fur
+    x.fillStyle = "#e8dcc0"; x.beginPath(); x.ellipse(128, 100, 52, 44, 0, 0, 6.2832); x.fill(); // face patch
+    x.fillStyle = "#5a4428"; x.beginPath(); x.ellipse(104, 92, 14, 9, 0.6, 0, 6.2832); x.fill(); x.beginPath(); x.ellipse(152, 92, 14, 9, -0.6, 0, 6.2832); x.fill(); // sleepy eye masks
+    x.strokeStyle = "#5a4428"; x.lineWidth = 4; x.beginPath(); x.arc(128, 122, 12, 0.3, Math.PI - 0.3); x.stroke(); // lazy smile
+    return canvasTex(c);
+  }
+  function buildPandaTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#f4f2ee"; x.fillRect(0, 0, 256, 256);
+    x.fillStyle = "#1a1a1e"; x.beginPath(); x.ellipse(70, 70, 40, 30, 0.5, 0, 6.2832); x.fill(); x.beginPath(); x.ellipse(190, 70, 40, 30, -0.5, 0, 6.2832); x.fill(); x.fillRect(0, 168, 256, 60); // eye + belly patches
+    x.fillStyle = "#5a8a3a"; x.beginPath(); x.ellipse(212, 210, 26, 9, 0.5, 0, 6.2832); x.fill(); // bamboo sprig
+    return canvasTex(c);
+  }
+  function buildPickleTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    var g = x.createLinearGradient(0, 0, 0, 256); g.addColorStop(0, "#7a9a3a"); g.addColorStop(1, "#4a6a20"); x.fillStyle = g; x.fillRect(0, 0, 256, 256);
+    x.fillStyle = "rgba(220,230,160,0.5)"; for (var n = 0; n < 40; n++) { x.beginPath(); x.arc(Math.random() * 256, Math.random() * 256, 3 + Math.random() * 4, 0, 6.2832); x.fill(); } // brine bumps
+    x.fillStyle = "rgba(40,60,15,0.5)"; for (var b = 0; b < 30; b++) { x.beginPath(); x.arc(Math.random() * 256, Math.random() * 256, 1.6, 0, 6.2832); x.fill(); } // dill flecks
+    return canvasTex(c);
+  }
+  // ---- the brainrot pantheon ----
+  function buildTungSahurTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    var g = x.createLinearGradient(0, 0, 256, 0); g.addColorStop(0, "#8a5a2a"); g.addColorStop(0.5, "#b8804a"); g.addColorStop(1, "#8a5a2a"); x.fillStyle = g; x.fillRect(0, 0, 256, 256); // wooden body
+    x.strokeStyle = "rgba(90,50,15,0.6)"; x.lineWidth = 3; for (var w = 0; w < 7; w++) { x.beginPath(); x.moveTo(0, w * 38 + 10); x.bezierCurveTo(80, w * 38 + 2, 180, w * 38 + 20, 256, w * 38 + 8); x.stroke(); } // wood grain
+    x.fillStyle = "#fff"; x.beginPath(); x.arc(96, 86, 22, 0, 6.2832); x.fill(); x.beginPath(); x.arc(160, 86, 22, 0, 6.2832); x.fill();
+    x.fillStyle = "#101010"; x.beginPath(); x.arc(96, 86, 9, 0, 6.2832); x.fill(); x.beginPath(); x.arc(160, 86, 9, 0, 6.2832); x.fill(); // wide staring eyes
+    x.fillStyle = "#5a3418"; x.fillRect(96, 150, 64, 44); x.fillStyle = "#3a2010"; x.fillRect(96, 150, 64, 8); // the bat
+    return canvasTex(c);
+  }
+  function buildTralaleroTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    var g = x.createLinearGradient(0, 0, 0, 256); g.addColorStop(0, "#5a7a9a"); g.addColorStop(0.55, "#8aa8c0"); g.addColorStop(1, "#e8ecf0"); x.fillStyle = g; x.fillRect(0, 0, 256, 256); // shark hide
+    x.strokeStyle = "rgba(30,45,60,0.6)"; x.lineWidth = 4; for (var s = 0; s < 4; s++) { x.beginPath(); x.moveTo(30 + s * 16, 60); x.quadraticCurveTo(38 + s * 16, 84, 30 + s * 16, 108); x.stroke(); } // gills
+    x.fillStyle = "#f4f4f2"; x.beginPath(); if (x.roundRect) x.roundRect(60, 176, 136, 52, 22); else x.rect(60, 176, 136, 52); x.fill(); // the Nike
+    x.fillStyle = "#1a1a1a"; x.beginPath(); x.moveTo(84, 206); x.quadraticCurveTo(128, 218, 176, 190); x.quadraticCurveTo(140, 212, 88, 212); x.closePath(); x.fill(); // swoosh
+    x.fillStyle = "#e03030"; x.fillRect(60, 168, 136, 10); // shoe collar
+    return canvasTex(c);
+  }
+  function buildBombardiroTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#5a6a4a"; x.fillRect(0, 0, 256, 256); // bomber fuselage
+    x.fillStyle = "#3a4a30"; for (var n = 0; n < 12; n++) { x.beginPath(); x.ellipse(Math.random() * 256, Math.random() * 256, 20, 12, Math.random() * 3, 0, 6.2832); x.fill(); } // camo
+    x.fillStyle = "#8ac84a"; for (var sc = 0; sc < 8; sc++) { x.beginPath(); x.moveTo(sc * 34, 30); x.lineTo(sc * 34 + 17, 48); x.lineTo(sc * 34 + 34, 30); x.closePath(); x.fill(); } // croc scutes
+    x.fillStyle = "#fff"; x.beginPath(); x.arc(80, 100, 16, 0, 6.2832); x.fill(); x.fillStyle = "#101010"; x.beginPath(); x.arc(84, 100, 6, 0, 6.2832); x.fill(); // croc eye
+    x.fillStyle = "#2a2a30"; x.beginPath(); x.ellipse(170, 190, 34, 13, 0.3, 0, 6.2832); x.fill(); x.fillStyle = "#e03030"; x.beginPath(); x.moveTo(200, 196); x.lineTo(216, 190); x.lineTo(200, 184); x.closePath(); x.fill(); // the bomb
+    return canvasTex(c);
+  }
+  function buildBallerinaTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    var g = x.createLinearGradient(0, 0, 0, 256); g.addColorStop(0, "#e8d8c8"); g.addColorStop(1, "#c8a888"); x.fillStyle = g; x.fillRect(0, 0, 256, 256);
+    x.fillStyle = "#f4f0ec"; x.beginPath(); x.arc(128, 84, 52, 0, 6.2832); x.fill(); x.strokeStyle = "#b09070"; x.lineWidth = 5; x.stroke(); // cappuccino cup head
+    x.fillStyle = "#a87848"; x.beginPath(); x.arc(128, 84, 40, 0, 6.2832); x.fill();
+    x.fillStyle = "#f4ecd8"; x.beginPath(); x.moveTo(128, 64); for (var h = 0; h < 10; h++) { var a = h * 0.628; x.lineTo(128 + Math.cos(a) * (h % 2 ? 10 : 26), 84 + Math.sin(a) * (h % 2 ? 10 : 26) * 0.5); } x.closePath(); x.fill(); // foam art
+    x.fillStyle = "#ffc8d8"; x.beginPath(); x.ellipse(128, 190, 96, 30, 0, 0, 6.2832); x.fill();
+    x.fillStyle = "#ffb0c8"; for (var t = 0; t < 12; t++) { x.beginPath(); x.moveTo(128, 190); var a2 = t * 0.523; x.lineTo(128 + Math.cos(a2) * 96, 190 + Math.sin(a2) * 30); x.lineTo(128 + Math.cos(a2 + 0.26) * 96, 190 + Math.sin(a2 + 0.26) * 30); x.closePath(); x.fill(); } // tutu
+    return canvasTex(c);
+  }
+  function buildAssassinoTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#241a14"; x.fillRect(0, 0, 256, 256); // espresso dark
+    x.fillStyle = "#3a2a1e"; for (var s = 0; s < 5; s++) x.fillRect(0, s * 56, 256, 24); // cloak wraps
+    x.fillStyle = "#c8a070"; x.fillRect(70, 96, 116, 26); // the eye slit
+    x.fillStyle = "#101010"; x.beginPath(); x.arc(104, 109, 9, 0, 6.2832); x.fill(); x.beginPath(); x.arc(152, 109, 9, 0, 6.2832); x.fill(); // narrowed eyes
+    x.fillStyle = "#c8ccd4"; x.save(); x.translate(190, 200); x.rotate(-0.6); x.fillRect(-4, -44, 8, 60); x.fillRect(-14, 12, 28, 8); x.restore(); // dagger
+    return canvasTex(c);
+  }
+  function buildPatapimTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    var g = x.createLinearGradient(0, 0, 0, 256); g.addColorStop(0, "#3a5a2a"); g.addColorStop(1, "#6a8a3a"); x.fillStyle = g; x.fillRect(0, 0, 256, 256); // forest body
+    x.strokeStyle = "rgba(30,40,18,0.7)"; x.lineWidth = 5;
+    for (var b = 0; b < 8; b++) { var sx = Math.random() * 256, sy = Math.random() * 200; x.beginPath(); x.moveTo(sx, sy + 56); x.quadraticCurveTo(sx + 14, sy + 20, sx + (Math.random() * 40 - 20), sy); x.stroke(); } // twisting branches
+    x.fillStyle = "#e8c890"; for (var hnd = 0; hnd < 5; hnd++) { var hx = Math.random() * 220 + 18, hy = Math.random() * 220 + 18; x.beginPath(); x.ellipse(hx, hy, 11, 14, 0, 0, 6.2832); x.fill(); for (var fg = 0; fg < 4; fg++) { x.beginPath(); x.ellipse(hx - 8 + fg * 5.5, hy - 16, 2.4, 7, 0, 0, 6.2832); x.fill(); } } // the many hands
+    x.fillStyle = "#ff8c50"; x.beginPath(); x.arc(128, 70, 20, 0, 6.2832); x.fill(); x.fillStyle = "#101010"; x.beginPath(); x.arc(128, 70, 8, 0, 6.2832); x.fill(); // big round nose-eye
+    return canvasTex(c);
+  }
+  function buildLiriliTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    var g = x.createLinearGradient(0, 0, 0, 256); g.addColorStop(0, "#f0d8a8"); g.addColorStop(1, "#d8b070"); x.fillStyle = g; x.fillRect(0, 0, 256, 256); // desert
+    x.fillStyle = "#a8b8c0"; x.beginPath(); x.ellipse(90, 110, 46, 38, 0, 0, 6.2832); x.fill(); x.fillRect(60, 130, 22, 60); // elephant head + trunk
+    x.fillStyle = "#8a9aa4"; x.beginPath(); x.ellipse(52, 100, 20, 26, 0.4, 0, 6.2832); x.fill(); // ear
+    x.fillStyle = "#101010"; x.beginPath(); x.arc(102, 102, 6, 0, 6.2832); x.fill();
+    x.fillStyle = "#5a8a3a"; x.fillRect(176, 90, 26, 120); x.fillRect(158, 110, 20, 14); x.fillRect(200, 130, 20, 14); // cactus arms
+    x.strokeStyle = "#3a3a44"; x.lineWidth = 5; x.beginPath(); x.arc(180, 60, 24, 0, 6.2832); x.stroke(); x.beginPath(); x.moveTo(180, 60); x.lineTo(180, 44); x.moveTo(180, 60); x.lineTo(192, 64); x.stroke(); // the ticking clock
+    return canvasTex(c);
+  }
+  function buildChimpanziniTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#ffd94b"; x.fillRect(0, 0, 256, 256); // banana suit
+    x.fillStyle = "#6a4a2a"; x.beginPath(); x.arc(128, 110, 58, 0, 6.2832); x.fill(); // monkey face ring
+    x.fillStyle = "#e8c8a0"; x.beginPath(); x.ellipse(128, 118, 44, 40, 0, 0, 6.2832); x.fill(); // muzzle
+    x.fillStyle = "#101010"; x.beginPath(); x.arc(108, 100, 9, 0, 6.2832); x.fill(); x.beginPath(); x.arc(148, 100, 9, 0, 6.2832); x.fill();
+    x.strokeStyle = "#101010"; x.lineWidth = 4; x.beginPath(); x.arc(128, 128, 18, 0.3, Math.PI - 0.3); x.stroke(); // grin
+    x.fillStyle = "#6a4a2a"; x.beginPath(); x.arc(66, 104, 16, 0, 6.2832); x.fill(); x.beginPath(); x.arc(190, 104, 16, 0, 6.2832); x.fill(); // ears
+    x.strokeStyle = "rgba(160,110,20,0.6)"; x.lineWidth = 6; x.beginPath(); x.moveTo(20, 220); x.quadraticCurveTo(128, 250, 236, 220); x.stroke(); // peel seam
+    return canvasTex(c);
+  }
+  function buildBombombiniTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    var g = x.createLinearGradient(0, 0, 0, 256); g.addColorStop(0, "#e8ecf0"); g.addColorStop(1, "#b8c4cc"); x.fillStyle = g; x.fillRect(0, 0, 256, 256); // goose plumage
+    x.strokeStyle = "rgba(140,150,160,0.5)"; x.lineWidth = 3; for (var f = 0; f < 30; f++) { var sx = Math.random() * 256, sy = Math.random() * 256; x.beginPath(); x.moveTo(sx, sy); x.quadraticCurveTo(sx + 12, sy - 6, sx + 24, sy); x.stroke(); } // feathers
+    x.fillStyle = "#ff8c20"; x.beginPath(); x.moveTo(96, 80); x.lineTo(160, 96); x.lineTo(96, 112); x.closePath(); x.fill(); // beak
+    x.fillStyle = "#101010"; x.beginPath(); x.arc(88, 74, 8, 0, 6.2832); x.fill(); // eye
+    x.fillStyle = "#2a2a30"; x.beginPath(); x.ellipse(160, 196, 36, 14, -0.2, 0, 6.2832); x.fill(); x.fillStyle = "#f0c020"; x.fillRect(190, 186, 8, 8); // slung bomb + fuse cap
+    return canvasTex(c);
+  }
+  function buildTrippiTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    var g = x.createLinearGradient(0, 0, 256, 256); g.addColorStop(0, "#ff9a70"); g.addColorStop(0.5, "#ff6890"); g.addColorStop(1, "#c04a70"); x.fillStyle = g; x.fillRect(0, 0, 256, 256); // shrimp shell
+    x.strokeStyle = "rgba(160,40,60,0.55)"; x.lineWidth = 6; for (var s = 0; s < 6; s++) { x.beginPath(); x.arc(128, 128, 40 + s * 22, -0.8, 0.8); x.stroke(); } // shell segments
+    x.fillStyle = "#f4f4f2"; x.beginPath(); x.arc(96, 90, 24, 0, 6.2832); x.fill(); x.beginPath(); x.arc(160, 90, 24, 0, 6.2832); x.fill();
+    x.fillStyle = "#101010"; x.beginPath(); x.arc(96, 94, 10, 0, 6.2832); x.fill(); x.beginPath(); x.arc(160, 94, 10, 0, 6.2832); x.fill(); // huge cat eyes
+    x.strokeStyle = "#101010"; x.lineWidth = 3; [[40, 108], [40, 118], [216, 108], [216, 118]].forEach(function (wk, i) { x.beginPath(); x.moveTo(i < 2 ? 76 : 180, 112); x.lineTo(wk[0], wk[1]); x.stroke(); }); // whiskers
+    return canvasTex(c);
+  }
+  function buildVacaSaturnoTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#101828"; x.fillRect(0, 0, 256, 256); // space
+    x.fillStyle = "#fff"; for (var st = 0; st < 40; st++) { x.beginPath(); x.arc(Math.random() * 256, Math.random() * 256, Math.random() * 1.4 + 0.4, 0, 6.2832); x.fill(); }
+    x.fillStyle = "#f4f2ee"; x.beginPath(); x.arc(128, 128, 62, 0, 6.2832); x.fill(); // cow planet
+    x.fillStyle = "#1a1a1e"; x.beginPath(); x.ellipse(104, 108, 20, 14, 0.4, 0, 6.2832); x.fill(); x.beginPath(); x.ellipse(152, 146, 22, 15, -0.3, 0, 6.2832); x.fill(); // holstein patches
+    x.fillStyle = "#ffb0c0"; x.beginPath(); x.ellipse(128, 158, 20, 12, 0, 0, 6.2832); x.fill(); x.fillStyle = "#e08898"; x.beginPath(); x.arc(120, 158, 3.4, 0, 6.2832); x.fill(); x.beginPath(); x.arc(136, 158, 3.4, 0, 6.2832); x.fill(); // snout
+    x.strokeStyle = "#e0c284"; x.lineWidth = 9; x.beginPath(); x.ellipse(128, 132, 106, 26, -0.18, 0, 6.2832); x.stroke(); // the ring
+    return canvasTex(c);
+  }
+  function buildFrigoCameloTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    var g = x.createLinearGradient(0, 0, 0, 256); g.addColorStop(0, "#d8b070"); g.addColorStop(1, "#b8905a"); x.fillStyle = g; x.fillRect(0, 0, 256, 256); // camel hide
+    x.fillStyle = "#e8f0f4"; x.fillRect(64, 40, 128, 176); // the fridge torso
+    x.strokeStyle = "#a8b4bc"; x.lineWidth = 5; x.strokeRect(64, 40, 128, 176); x.beginPath(); x.moveTo(64, 110); x.lineTo(192, 110); x.stroke(); // freezer split
+    x.fillStyle = "#a8b4bc"; x.fillRect(176, 60, 8, 36); x.fillRect(176, 124, 8, 56); // handles
+    x.fillStyle = "#8ad0e8"; for (var ice = 0; ice < 6; ice++) x.fillRect(76 + (ice % 3) * 26, 64 + (ice / 3 | 0) * 20, 16, 12); // ice cubes inside
+    return canvasTex(c);
+  }
+  function buildSkibidiTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    var g = x.createLinearGradient(0, 0, 0, 256); g.addColorStop(0, "#e8ecf0"); g.addColorStop(1, "#c0ccd4"); x.fillStyle = g; x.fillRect(0, 0, 256, 256); // porcelain
+    x.strokeStyle = "#98a4ac"; x.lineWidth = 5; x.beginPath(); x.ellipse(128, 100, 88, 46, 0, 0, 6.2832); x.stroke(); // the bowl rim
+    x.fillStyle = "#5ab0d8"; x.beginPath(); x.ellipse(128, 100, 70, 32, 0, 0, 6.2832); x.fill(); // water
+    x.fillStyle = "#f4d0b0"; x.beginPath(); x.arc(128, 92, 26, 0, 6.2832); x.fill(); // the head emerges
+    x.fillStyle = "#101010"; x.beginPath(); x.arc(118, 88, 5, 0, 6.2832); x.fill(); x.beginPath(); x.arc(138, 88, 5, 0, 6.2832); x.fill();
+    x.strokeStyle = "#101010"; x.lineWidth = 3; x.beginPath(); x.arc(128, 100, 10, 0.3, Math.PI - 0.3); x.stroke(); // grin
+    x.fillStyle = "#c0ccd4"; x.fillRect(96, 170, 64, 60); x.fillStyle = "#a8b4bc"; x.fillRect(88, 222, 80, 18); // tank + base
+    return canvasTex(c);
+  }
+  function buildSigmaTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    var g = x.createLinearGradient(0, 0, 256, 256); g.addColorStop(0, "#6a6a72"); g.addColorStop(1, "#3a3a42"); x.fillStyle = g; x.fillRect(0, 0, 256, 256); // moai stone
+    x.fillStyle = "#52525a"; x.fillRect(70, 60, 116, 130);
+    x.fillStyle = "#2e2e36"; x.fillRect(84, 96, 34, 14); x.fillRect(138, 96, 34, 14); // heavy brow shadows
+    x.fillStyle = "#46464e"; x.fillRect(116, 104, 24, 60); // the nose
+    x.fillStyle = "#2e2e36"; x.fillRect(96, 176, 64, 10); // stoic mouth
+    x.fillStyle = "rgba(255,255,255,0.14)"; for (var n = 0; n < 26; n++) x.fillRect(Math.random() * 256, Math.random() * 256, 3, 3); // stone pores
+    return canvasTex(c);
+  }
+  function buildBrainrotTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    var g = x.createRadialGradient(128, 128, 20, 128, 128, 170); g.addColorStop(0, "#ff9ab0"); g.addColorStop(1, "#d05a80"); x.fillStyle = g; x.fillRect(0, 0, 256, 256); // brain pink
+    x.strokeStyle = "rgba(150,40,70,0.7)"; x.lineWidth = 7;
+    for (var f = 0; f < 10; f++) { var sx = Math.random() * 256, sy = Math.random() * 256; x.beginPath(); x.moveTo(sx, sy); for (var seg = 0; seg < 4; seg++) { sx += Math.random() * 44 - 22; sy += Math.random() * 44 - 22; x.quadraticCurveTo(sx + 10, sy - 10, sx, sy); } x.stroke(); } // squiggly folds
+    x.fillStyle = "#40e0ff"; x.font = "bold 17px monospace"; x.fillText("¯\\_(ツ)_/¯", 66, 132); // the rot
+    return canvasTex(c);
+  }
 
   // a peel-tinted panel stamped with a big number, for the puzzle banana's
   // "peel in order" challenge (drawn on the strips themselves)
@@ -2620,7 +3068,26 @@
     ramen: buildRamenTexture(), lantern: buildLanternTexture(), carousel: buildCarouselTexture(),
     viking: buildVikingTexture(), shark: buildSharkTexture(), cloud: buildCloudTexture(),
     lollipop: buildLollipopTexture(), bamboo: buildBambooTexture(), bowling: buildBowlingTexture(),
-    croissant: buildCroissantTexture()
+    croissant: buildCroissantTexture(),
+    boba: buildBobaTexture(), y2k: buildY2kTexture(), cottagecore: buildCottagecoreTexture(),
+    goth: buildGothTexture(), barbie: buildBarbieTexture(), vaporwave: buildVaporwaveTexture(),
+    vhs: buildVhsTexture(), avocado: buildAvocadoTexture(), juicebox: buildJuiceboxTexture(),
+    strawmilk: buildStrawmilkTexture(), taco: buildTacoTexture(), dumpling: buildDumplingTexture(),
+    matcha: buildMatchaTexture(), skeleton: buildSkeletonTexture(), gamer: buildGamerTexture(),
+    floppy: buildFloppyTexture(), skater: buildSkaterTexture(), teddy: buildTeddyTexture(),
+    kawaii: buildKawaiiTexture(), pride: buildPrideTexture(), bling: buildBlingTexture(),
+    money: buildMoneyTexture(), matrix: buildMatrixTexture(), melting: buildMeltingTexture(),
+    flamingo: buildFlamingoTexture(), kiwi: buildKiwiTexture(), blueberry: buildBlueberryTexture(),
+    toast: buildToastTexture(), waffle: buildWaffleTexture(), lofi: buildLofiTexture(),
+    rocket: buildRocketTexture(), doomscroll: buildDoomscrollTexture(), mecha: buildMechaTexture(),
+    peach: buildPeachTexture(), mango: buildMangoTexture(), fairy: buildFairyTexture(),
+    chess: buildChessTexture(), sloth: buildSlothTexture(), panda: buildPandaTexture(),
+    pickle: buildPickleTexture(),
+    tungsahur: buildTungSahurTexture(), tralalero: buildTralaleroTexture(), bombardiro: buildBombardiroTexture(),
+    ballerina: buildBallerinaTexture(), assassino: buildAssassinoTexture(), patapim: buildPatapimTexture(),
+    lirili: buildLiriliTexture(), chimpanzini: buildChimpanziniTexture(), bombombini: buildBombombiniTexture(),
+    trippitroppi: buildTrippiTexture(), vacasaturno: buildVacaSaturnoTexture(), frigocamelo: buildFrigoCameloTexture(),
+    skibidi: buildSkibidiTexture(), sigma: buildSigmaTexture(), brainrot: buildBrainrotTexture()
   };
 
   // ---- rarity tiers: each banana rolls one; the inner fruit takes the material.
@@ -2828,6 +3295,175 @@
     { name: "croissant", mult: 5, weight: 1.6, label: "🥐 Croissant Banana", chomp: true,
       core: { color: 0xffffff, mapKind: "croissant", metalness: 0.0, roughness: 0.5,
         emissive: 0x402408, emissiveIntensity: 0.12, envMapIntensity: 0.8 } },
+    { name: "boba", mult: 7, weight: 1.3, label: "🧋 Boba Banana", gooey: true, chomp: true,
+      core: { physical: true, color: 0xffffff, mapKind: "boba", metalness: 0.0, roughness: 0.15,
+        transmission: 0.25, thickness: 0.9, ior: 1.35, clearcoat: 0.9, clearcoatRoughness: 0.1,
+        emissive: 0x402c18, emissiveIntensity: 0.1, envMapIntensity: 1.1 } },
+    { name: "y2k", mult: 11, weight: 0.9, label: "💿 Y2K Banana", hueShift: true, sparkle: true,
+      core: { physical: true, color: 0xffffff, mapKind: "y2k", metalness: 0.9, roughness: 0.12,
+        clearcoat: 1.0, clearcoatRoughness: 0.06, emissive: 0x303048, emissiveIntensity: 0.15, envMapIntensity: 2.0 } },
+    { name: "cottagecore", mult: 6, weight: 1.4, label: "🌼 Cottagecore Banana", sway: true, revealSound: "chime",
+      core: { color: 0xffffff, mapKind: "cottagecore", metalness: 0.0, roughness: 0.6,
+        emissive: 0x403020, emissiveIntensity: 0.06, envMapIntensity: 0.7 } },
+    { name: "goth", mult: 10, weight: 1.0, label: "🖤 Goth Banana", pulse: true, heartbeat: true,
+      core: { physical: true, color: 0xffffff, mapKind: "goth", metalness: 0.2, roughness: 0.35,
+        clearcoat: 0.7, clearcoatRoughness: 0.2, emissive: 0x40204a, emissiveIntensity: 0.25, envMapIntensity: 1.0 } },
+    { name: "barbie", mult: 9, weight: 1.05, label: "🩷 Barbiecore Banana", sparkle: true, squeaky: true,
+      core: { physical: true, color: 0xffffff, mapKind: "barbie", metalness: 0.1, roughness: 0.15,
+        clearcoat: 1.0, clearcoatRoughness: 0.08, emissive: 0xff2d88, emissiveIntensity: 0.2, envMapIntensity: 1.3 } },
+    { name: "vaporwave", mult: 12, weight: 0.8, label: "🌴 Vaporwave Banana", hueShift: true, flow: { x: 0.03, y: 0 },
+      core: { color: 0xffffff, mapKind: "vaporwave", glowMap: true, metalness: 0.2, roughness: 0.3,
+        emissive: 0xff6ab0, emissiveIntensity: 0.4, envMapIntensity: 0.9 } },
+    { name: "vhs", mult: 9, weight: 1.0, label: "📼 VHS Banana", blink: true, jumpcut: true,
+      core: { color: 0xffffff, mapKind: "vhs", glowMap: true, metalness: 0.1, roughness: 0.5,
+        emissive: 0x808088, emissiveIntensity: 0.35, envMapIntensity: 0.6 } },
+    { name: "avocado", mult: 6, weight: 1.4, label: "🥑 Avocado Banana", breatheAmp: 0.07,
+      core: { color: 0xffffff, mapKind: "avocado", metalness: 0.0, roughness: 0.45,
+        emissive: 0x1a2a08, emissiveIntensity: 0.08, envMapIntensity: 0.8 } },
+    { name: "juicebox", mult: 5, weight: 1.55, label: "🧃 Juicebox Banana", squeaky: true,
+      core: { color: 0xffffff, mapKind: "juicebox", metalness: 0.0, roughness: 0.4,
+        emissive: 0x402408, emissiveIntensity: 0.08, envMapIntensity: 0.8 } },
+    { name: "strawmilk", mult: 6, weight: 1.45, label: "🍓 Strawberry Milk Banana", breatheAmp: 0.06, revealSound: "chime",
+      core: { physical: true, color: 0xffffff, mapKind: "strawmilk", metalness: 0.0, roughness: 0.25,
+        clearcoat: 0.7, clearcoatRoughness: 0.2, emissive: 0x401824, emissiveIntensity: 0.1, envMapIntensity: 1.0 } },
+    { name: "taco", mult: 7, weight: 1.3, label: "🌮 Taco Banana", chomp: true,
+      core: { color: 0xffffff, mapKind: "taco", metalness: 0.0, roughness: 0.55,
+        emissive: 0x402408, emissiveIntensity: 0.08, envMapIntensity: 0.7 } },
+    { name: "dumpling", mult: 6, weight: 1.4, label: "🥟 Dumpling Banana", gooey: true, squeaky: true,
+      core: { color: 0xffffff, mapKind: "dumpling", metalness: 0.0, roughness: 0.5,
+        emissive: 0x302818, emissiveIntensity: 0.06, envMapIntensity: 0.7 } },
+    { name: "matcha", mult: 8, weight: 1.15, label: "🍵 Matcha Banana", flow: { x: 0.02, y: 0.01 }, revealSound: "chime",
+      core: { physical: true, color: 0xffffff, mapKind: "matcha", metalness: 0.0, roughness: 0.3,
+        clearcoat: 0.6, clearcoatRoughness: 0.25, emissive: 0x203a10, emissiveIntensity: 0.1, envMapIntensity: 0.9 } },
+    { name: "skeleton", mult: 11, weight: 0.9, label: "🦴 Skeleton Banana", heartbeat: true, pulse: true, snapStrip: true,
+      core: { color: 0xffffff, mapKind: "skeleton", glowMap: true, metalness: 0.0, roughness: 0.55,
+        emissive: 0xc8c4b8, emissiveIntensity: 0.25, envMapIntensity: 0.6 } },
+    { name: "gamer", mult: 10, weight: 1.0, label: "🎮 Gamer Banana", hueShift: true, arcade: true,
+      core: { color: 0xffffff, mapKind: "gamer", glowMap: true, metalness: 0.3, roughness: 0.35,
+        emissive: 0x40ff90, emissiveIntensity: 0.5, envMapIntensity: 0.9 } },
+    { name: "floppy", mult: 8, weight: 1.15, label: "💾 Floppy Banana", snapStrip: true,
+      core: { color: 0xffffff, mapKind: "floppy", metalness: 0.1, roughness: 0.5,
+        emissive: 0x101040, emissiveIntensity: 0.1, envMapIntensity: 0.8 } },
+    { name: "skater", mult: 8, weight: 1.1, label: "🛹 Skater Banana", punch: true,
+      core: { color: 0xffffff, mapKind: "skater", metalness: 0.1, roughness: 0.7,
+        emissive: 0x201408, emissiveIntensity: 0.08, envMapIntensity: 0.7 } },
+    { name: "teddy", mult: 7, weight: 1.25, label: "🧸 Teddy Banana", squeaky: true, breatheAmp: 0.08,
+      core: { color: 0xffffff, mapKind: "teddy", metalness: 0.0, roughness: 0.85,
+        emissive: 0x2a1c10, emissiveIntensity: 0.08, envMapIntensity: 0.5 } },
+    { name: "kawaii", mult: 8, weight: 1.1, label: "🫶 Kawaii Banana", squeaky: true, sparkle: true, breatheAmp: 0.07,
+      core: { physical: true, color: 0xffffff, mapKind: "kawaii", metalness: 0.0, roughness: 0.25,
+        clearcoat: 0.8, clearcoatRoughness: 0.15, emissive: 0x402030, emissiveIntensity: 0.1, envMapIntensity: 1.0 } },
+    { name: "pride", mult: 10, weight: 0.95, label: "🌈 Pride Banana", sparkle: true, bigBurst: true,
+      multiBurstColors: [0xe40303, 0xff8c00, 0xffed00, 0x008026, 0x24408e, 0x732982],
+      core: { physical: true, color: 0xffffff, mapKind: "pride", metalness: 0.1, roughness: 0.3,
+        clearcoat: 0.7, clearcoatRoughness: 0.2, emissive: 0x303030, emissiveIntensity: 0.1, envMapIntensity: 1.1 } },
+    { name: "bling", mult: 15, weight: 0.6, label: "💎 Iced-Out Banana", sparkle: true, heavy: true,
+      core: { physical: true, color: 0xffffff, mapKind: "bling", metalness: 1.0, roughness: 0.08,
+        clearcoat: 1.0, clearcoatRoughness: 0.05, emissive: 0x203040, emissiveIntensity: 0.15, envMapIntensity: 2.4 } },
+    { name: "money", mult: 12, weight: 0.8, label: "💸 Money Banana", bank: true,
+      core: { color: 0xffffff, mapKind: "money", metalness: 0.0, roughness: 0.6,
+        emissive: 0x1a2a10, emissiveIntensity: 0.08, envMapIntensity: 0.7 } },
+    { name: "matrix", mult: 13, weight: 0.7, label: "🕶️ Matrix Banana", flow: { x: 0, y: -0.15 },
+      core: { color: 0xffffff, mapKind: "matrix", glowMap: true, metalness: 0.1, roughness: 0.4,
+        emissive: 0x14dc46, emissiveIntensity: 0.6, envMapIntensity: 0.6 } },
+    { name: "melting", mult: 9, weight: 1.0, label: "🫠 Melting Banana", gooey: true, melts: true,
+      core: { physical: true, color: 0xffffff, mapKind: "melting", metalness: 0.0, roughness: 0.2,
+        clearcoat: 0.8, clearcoatRoughness: 0.15, emissive: 0x402008, emissiveIntensity: 0.12, envMapIntensity: 1.0 } },
+    { name: "flamingo", mult: 8, weight: 1.1, label: "🦩 Flamingo Banana", sway: true, squeaky: true,
+      core: { color: 0xffffff, mapKind: "flamingo", metalness: 0.0, roughness: 0.45,
+        emissive: 0x401820, emissiveIntensity: 0.1, envMapIntensity: 0.8 } },
+    { name: "kiwi", mult: 7, weight: 1.3, label: "🥝 Kiwi Banana", prickly: true,
+      core: { color: 0xffffff, mapKind: "kiwi", metalness: 0.0, roughness: 0.6,
+        emissive: 0x1a2a08, emissiveIntensity: 0.08, envMapIntensity: 0.7 } },
+    { name: "blueberry", mult: 11, weight: 0.9, label: "🫐 Blueberry Banana", inflate: true, bigBurst: true,
+      core: { physical: true, color: 0xffffff, mapKind: "blueberry", metalness: 0.1, roughness: 0.3,
+        clearcoat: 0.8, clearcoatRoughness: 0.15, emissive: 0x202060, emissiveIntensity: 0.2, envMapIntensity: 1.1 } },
+    { name: "toast", mult: 5, weight: 1.55, label: "🍞 Toast Banana", chomp: true,
+      core: { color: 0xffffff, mapKind: "toast", metalness: 0.0, roughness: 0.65,
+        emissive: 0x402408, emissiveIntensity: 0.1, envMapIntensity: 0.6 } },
+    { name: "waffle", mult: 6, weight: 1.4, label: "🧇 Waffle Banana", chomp: true, flow: { x: 0, y: 0.04 },
+      core: { color: 0xffffff, mapKind: "waffle", metalness: 0.0, roughness: 0.55,
+        emissive: 0x402408, emissiveIntensity: 0.1, envMapIntensity: 0.7 } },
+    { name: "lofi", mult: 9, weight: 1.0, label: "🎧 Lo-fi Banana", musical: true, slowmo: true,
+      core: { color: 0xffffff, mapKind: "lofi", glowMap: true, metalness: 0.0, roughness: 0.45,
+        emissive: 0x8a5a7a, emissiveIntensity: 0.3, envMapIntensity: 0.7 } },
+    { name: "rocket", mult: 12, weight: 0.8, label: "🚀 Rocket Banana", floaty: true, bigBurst: true, revealSound: "rumble",
+      core: { physical: true, color: 0xffffff, mapKind: "rocket", metalness: 0.4, roughness: 0.25,
+        clearcoat: 0.7, clearcoatRoughness: 0.15, emissive: 0x301818, emissiveIntensity: 0.1, envMapIntensity: 1.3 } },
+    { name: "doomscroll", mult: 10, weight: 0.95, label: "📱 Doomscroll Banana", flow: { x: 0, y: -0.35 }, moodSwing: true,
+      core: { color: 0xffffff, mapKind: "doomscroll", glowMap: true, metalness: 0.1, roughness: 0.4,
+        emissive: 0x4a4a6a, emissiveIntensity: 0.4, envMapIntensity: 0.6 } },
+    { name: "mecha", mult: 13, weight: 0.7, label: "🤖 Mecha Banana", punch: true, revealSound: "rumble",
+      core: { physical: true, color: 0xffffff, mapKind: "mecha", metalness: 0.8, roughness: 0.35,
+        clearcoat: 0.4, clearcoatRoughness: 0.2, emissive: 0x104020, emissiveIntensity: 0.15, envMapIntensity: 1.5 } },
+    { name: "peach", mult: 7, weight: 1.25, label: "🍑 Peach Banana", breatheAmp: 0.08, squeaky: true,
+      core: { color: 0xffffff, mapKind: "peach", metalness: 0.0, roughness: 0.7,
+        emissive: 0x402018, emissiveIntensity: 0.1, envMapIntensity: 0.7 } },
+    { name: "mango", mult: 7, weight: 1.25, label: "🥭 Mango Banana", gooey: true, revealSound: "chime",
+      core: { physical: true, color: 0xffffff, mapKind: "mango", metalness: 0.0, roughness: 0.2,
+        clearcoat: 0.8, clearcoatRoughness: 0.12, emissive: 0x402408, emissiveIntensity: 0.12, envMapIntensity: 1.0 } },
+    { name: "fairy", mult: 12, weight: 0.8, label: "🧚 Fairy Banana", floaty: true, sparkle: true, revealSound: "chime",
+      core: { physical: true, color: 0xffffff, mapKind: "fairy", metalness: 0.1, roughness: 0.2,
+        transmission: 0.2, thickness: 0.6, ior: 1.25, clearcoat: 0.8, clearcoatRoughness: 0.1,
+        emissive: 0xc0d8ff, emissiveIntensity: 0.25, envMapIntensity: 1.2 } },
+    { name: "chess", mult: 11, weight: 0.85, label: "♟️ Chess Banana", ordered: true,
+      core: { color: 0xffffff, mapKind: "chess", metalness: 0.1, roughness: 0.4,
+        emissive: 0x202020, emissiveIntensity: 0.08, envMapIntensity: 0.9 } },
+    { name: "sloth", mult: 8, weight: 1.1, label: "🦥 Sloth Banana", slowmo: true, breatheAmp: 0.05, revealSound: "womp",
+      core: { color: 0xffffff, mapKind: "sloth", metalness: 0.0, roughness: 0.8,
+        emissive: 0x2a2010, emissiveIntensity: 0.06, envMapIntensity: 0.5 } },
+    { name: "panda", mult: 9, weight: 1.0, label: "🐼 Panda Banana", chomp: true, breatheAmp: 0.06,
+      core: { color: 0xffffff, mapKind: "panda", metalness: 0.0, roughness: 0.55,
+        emissive: 0x1a1a1e, emissiveIntensity: 0.06, envMapIntensity: 0.8 } },
+    { name: "pickle", mult: 6, weight: 1.4, label: "🥒 Pickle Banana", prickly: true, squeaky: true,
+      core: { physical: true, color: 0xffffff, mapKind: "pickle", metalness: 0.0, roughness: 0.3,
+        clearcoat: 0.6, clearcoatRoughness: 0.2, emissive: 0x1a2a08, emissiveIntensity: 0.1, envMapIntensity: 0.9 } },
+    // ---- the brainrot pantheon ----
+    { name: "tungsahur", mult: 16, weight: 0.5, label: "🥁 Tung Tung Tung Sahur Banana", stomp: true, revealSound: "knock",
+      core: { color: 0xffffff, mapKind: "tungsahur", metalness: 0.0, roughness: 0.6,
+        emissive: 0x2a1808, emissiveIntensity: 0.1, envMapIntensity: 0.7 } },
+    { name: "tralalero", mult: 15, weight: 0.55, label: "🦈👟 Tralalero Tralala Banana", slash: true, swiftBonus: true, revealSound: "cheer",
+      core: { physical: true, color: 0xffffff, mapKind: "tralalero", metalness: 0.2, roughness: 0.3,
+        clearcoat: 0.7, clearcoatRoughness: 0.15, emissive: 0x102030, emissiveIntensity: 0.1, envMapIntensity: 1.2 } },
+    { name: "bombardiro", mult: 17, weight: 0.45, label: "✈️🐊 Bombardiro Crocodilo Banana", bigBurst: true, fastPulse: true, pulse: true, revealSound: "rumble",
+      core: { color: 0xffffff, mapKind: "bombardiro", metalness: 0.2, roughness: 0.5,
+        emissive: 0x2a3a1a, emissiveIntensity: 0.12, envMapIntensity: 0.8 } },
+    { name: "ballerina", mult: 14, weight: 0.6, label: "☕🩰 Ballerina Cappuccina Banana", discoSpin: true, musical: true,
+      core: { physical: true, color: 0xffffff, mapKind: "ballerina", metalness: 0.1, roughness: 0.3,
+        clearcoat: 0.7, clearcoatRoughness: 0.2, emissive: 0x402c1c, emissiveIntensity: 0.1, envMapIntensity: 1.0 } },
+    { name: "assassino", mult: 15, weight: 0.55, label: "☕🥷 Cappuccino Assassino Banana", slash: true, swiftBonus: true, stealthOpacity: 0.55,
+      core: { color: 0xffffff, mapKind: "assassino", metalness: 0.2, roughness: 0.4,
+        emissive: 0x241a14, emissiveIntensity: 0.15, envMapIntensity: 0.8 } },
+    { name: "patapim", mult: 13, weight: 0.65, label: "🌳🙌 Brr Brr Patapim Banana", sway: true, prickly: true, squeaky: true,
+      core: { color: 0xffffff, mapKind: "patapim", metalness: 0.0, roughness: 0.65,
+        emissive: 0x1a2a10, emissiveIntensity: 0.08, envMapIntensity: 0.7 } },
+    { name: "lirili", mult: 14, weight: 0.6, label: "🐘🌵 Lirili Larila Banana", slowmo: true, revealSound: "chime",
+      core: { color: 0xffffff, mapKind: "lirili", metalness: 0.0, roughness: 0.5,
+        emissive: 0x302810, emissiveIntensity: 0.08, envMapIntensity: 0.8 } },
+    { name: "chimpanzini", mult: 18, weight: 0.42, label: "🐒🍌 Chimpanzini Bananini Banana", breatheAmp: 0.09, squeaky: true, infectNext: true,
+      core: { color: 0xffffff, mapKind: "chimpanzini", metalness: 0.0, roughness: 0.45,
+        emissive: 0x403008, emissiveIntensity: 0.12, envMapIntensity: 0.8 } },
+    { name: "bombombini", mult: 14, weight: 0.6, label: "🪿💣 Bombombini Gusini Banana", firework: true, bigBurst: true, squeaky: true,
+      core: { color: 0xffffff, mapKind: "bombombini", metalness: 0.1, roughness: 0.5,
+        emissive: 0x202428, emissiveIntensity: 0.08, envMapIntensity: 0.9 } },
+    { name: "trippitroppi", mult: 13, weight: 0.65, label: "🦐🐱 Trippi Troppi Banana", hueShift: true, gooey: true,
+      core: { physical: true, color: 0xffffff, mapKind: "trippitroppi", metalness: 0.1, roughness: 0.25,
+        clearcoat: 0.8, clearcoatRoughness: 0.12, emissive: 0x40182a, emissiveIntensity: 0.12, envMapIntensity: 1.1 } },
+    { name: "vacasaturno", mult: 19, weight: 0.4, label: "🐄🪐 La Vaca Saturno Saturnita Banana", ring: true, floaty: true, revealSound: "womp",
+      core: { color: 0xffffff, mapKind: "vacasaturno", glowMap: true, metalness: 0.1, roughness: 0.4,
+        emissive: 0x8a94b8, emissiveIntensity: 0.3, envMapIntensity: 0.8 } },
+    { name: "frigocamelo", mult: 13, weight: 0.65, label: "🐫🧊 Frigo Camelo Banana", melts: true, heavy: true, revealSound: "thud",
+      core: { physical: true, color: 0xffffff, mapKind: "frigocamelo", metalness: 0.2, roughness: 0.2,
+        clearcoat: 0.7, clearcoatRoughness: 0.15, emissive: 0x203038, emissiveIntensity: 0.1, envMapIntensity: 1.1 } },
+    { name: "skibidi", mult: 15, weight: 0.55, label: "🚽 Skibidi Banana", scare: true, squeaky: true,
+      core: { physical: true, color: 0xffffff, mapKind: "skibidi", metalness: 0.2, roughness: 0.15,
+        clearcoat: 0.9, clearcoatRoughness: 0.08, emissive: 0x203038, emissiveIntensity: 0.1, envMapIntensity: 1.3 } },
+    { name: "sigma", mult: 16, weight: 0.5, label: "🗿 Sigma Banana", heavy: true, bestBonus: true, revealSound: "thud",
+      core: { color: 0xffffff, mapKind: "sigma", metalness: 0.1, roughness: 0.8,
+        emissive: 0x1a1a20, emissiveIntensity: 0.06, envMapIntensity: 0.7 } },
+    { name: "brainrot", mult: 20, weight: 0.38, label: "🧠 Brainrot Banana", hueShift: true, gooey: true, infectNext: true, dangerMsg: true,
+      core: { physical: true, color: 0xffffff, mapKind: "brainrot", metalness: 0.0, roughness: 0.25,
+        clearcoat: 0.8, clearcoatRoughness: 0.15, emissive: 0xff5a80, emissiveIntensity: 0.3, envMapIntensity: 1.0 } },
     { name: "cosmicwhale", mult: 22, weight: 0.35, label: "🐋 Cosmic Whale Banana", floaty: true, pulse: true, revealSound: "whale",
       core: { color: 0xffffff, mapKind: "cosmicwhale", glowMap: true, metalness: 0.1, roughness: 0.4,
         emissive: 0x6a8cff, emissiveIntensity: 0.5, envMapIntensity: 0.7 } },
@@ -3129,7 +3765,13 @@
   // 50/50: half of all bananas are rare, shared across tiers by weight so
   // higher-weight tiers (bronze, rotten, wooden…) come up more than the
   // ultra-rares (diamond, galaxy, rainbow…)
-  var RARE_TOTAL = 0.5;
+  // with 215 tiers to hunt, most peels should mean something: 70% of bananas
+  // roll rare, a pity counter caps normal droughts, and still-locked tiers
+  // get a discovery boost so the collection keeps moving forward
+  var RARE_TOTAL = 0.7;
+  var PITY_LIMIT = 4;      // never more than 4 plain bananas in a row
+  var DISCOVERY_BOOST = 1.5; // unowned tiers weigh half again as much
+  var normalStreak = 0;
   var TOTAL_WEIGHT = RARITIES.reduce(function (sum, r) { return sum + r.weight; }, 0);
   RARITIES.forEach(function (r) { r.chance = RARE_TOTAL * r.weight / TOTAL_WEIGHT; });
   // debris color for each tier's completion burst (default gold for normals)
@@ -3175,7 +3817,22 @@
     eclipse: 0xffb020, tickle: 0xffc8a0, frog: 0x50c040, bell: 0xe0a83e,
     ramen: 0xe8c890, lantern: 0xff6020, carousel: 0xffd0e0, viking: 0x8a9098,
     shark: 0x7a8c9a, cloud: 0xffffff, lollipop: 0xff3b6b, bamboo: 0x7ab84a,
-    bowling: 0xe03030, croissant: 0xe8a850
+    bowling: 0xe03030, croissant: 0xe8a850,
+    boba: 0xc8a078, y2k: 0xd8e8f8, cottagecore: 0xe08898, goth: 0x7a5a9a,
+    barbie: 0xff5fae, vaporwave: 0xff6ab0, vhs: 0x8888a0, avocado: 0x8ab84a,
+    juicebox: 0xff9a30, strawmilk: 0xffb0c8, taco: 0xf0c060, dumpling: 0xf0e4d0,
+    matcha: 0xa8c878, skeleton: 0xe8e4d8, gamer: 0x40ff90, floppy: 0x6a6ae8,
+    skater: 0xff5a20, teddy: 0xb8845a, kawaii: 0xffb0d0, pride: 0xff66cc,
+    bling: 0xbfe8ff, money: 0x9ab88a, matrix: 0x14dc46, melting: 0xff8c2e,
+    flamingo: 0xff9ab8, kiwi: 0xa8d048, blueberry: 0x7a86e8, toast: 0xe8c088,
+    waffle: 0xe8a850, lofi: 0xc0a0d8, rocket: 0xe03030, doomscroll: 0x6a6a8a,
+    mecha: 0x3ce080, peach: 0xff9a70, mango: 0xffc030, fairy: 0xd8e8ff,
+    chess: 0xe8dcc8, sloth: 0xa89068, panda: 0xf4f2ee, pickle: 0x7a9a3a,
+    tungsahur: 0xb8804a, tralalero: 0x8aa8c0, bombardiro: 0x8ac84a,
+    ballerina: 0xffc8d8, assassino: 0xc8a070, patapim: 0x6a8a3a,
+    lirili: 0xd8b070, chimpanzini: 0xffd94b, bombombini: 0xff8c20,
+    trippitroppi: 0xff6890, vacasaturno: 0xe0c284, frigocamelo: 0x8ad0e8,
+    skibidi: 0x5ab0d8, sigma: 0x6a6a72, brainrot: 0xff5a80
   };
   RARITIES.forEach(function (r) { r.burstColor = BURST_COLORS[r.name]; });
   var cheatQueue = null; // null = off; otherwise the still-locked tiers left to hand out
@@ -3199,12 +3856,22 @@
         if (RARITIES[t].name === "trophy") return RARITIES[t];
       }
     }
-    var r = Math.random(), acc = 0;
+    var wantRare = Math.random() < RARE_TOTAL || normalStreak >= PITY_LIMIT;
+    if (!wantRare) { normalStreak++; return null; } // normal banana
+    normalStreak = 0;
+    // discovery luck: tiers not yet in the collection weigh extra
+    var owned = collection || {};
+    var weights = [], total = 0;
     for (var i = 0; i < RARITIES.length; i++) {
-      acc += RARITIES[i].chance;
-      if (r < acc) return RARITIES[i];
+      var w = RARITIES[i].weight * (owned[RARITIES[i].name] ? 1 : DISCOVERY_BOOST);
+      weights.push(w); total += w;
     }
-    return null; // normal banana
+    var roll = Math.random() * total;
+    for (var j = 0; j < RARITIES.length; j++) {
+      roll -= weights[j];
+      if (roll <= 0) return RARITIES[j];
+    }
+    return RARITIES[RARITIES.length - 1];
   }
 
   // build the inner-fruit material from a core spec (physical for glass/chocolate)
@@ -3697,7 +4364,17 @@
     lantern:   { color: 0xffb050, dir: 1, spread: 0.4, speed: 0.15, life: 1.8, size: 0.05, wobble: true },  // warm embers
     cloud:     { color: 0xffffff, dir: 0, spread: 0.7, speed: 0.06, life: 2.6, size: 0.065, wobble: true }, // drifting mist
     croissant: { color: 0xf0d8a0, dir: -1, spread: 0.35, speed: 0.2, life: 1.6, size: 0.045 },              // falling flakes
-    lollipop:  { color: 0xff8cc0, dir: 0, spread: 0.55, speed: 0.1, life: 1.8, size: 0.05, wobble: true }   // sugar sparkle
+    lollipop:  { color: 0xff8cc0, dir: 0, spread: 0.55, speed: 0.1, life: 1.8, size: 0.05, wobble: true },  // sugar sparkle
+    boba:      { color: 0x3a2418, dir: 1, spread: 0.35, speed: 0.2, life: 1.6, size: 0.06, wobble: true },  // pearls rising the straw
+    matrix:    { color: 0x14dc46, dir: -1, spread: 0.55, speed: 0.6, life: 1.2, size: 0.045 },              // code rain
+    lofi:      { color: 0xa8b8e8, dir: -1, spread: 0.7, speed: 0.5, life: 1.4, size: 0.04 },                // window rain
+    vaporwave: { color: 0x50f0ff, dir: 1, spread: 0.6, speed: 0.1, life: 2.2, size: 0.05, wobble: true },   // neon grid motes
+    rocket:    { color: 0xffb040, dir: -1, spread: 0.2, speed: 0.7, life: 0.8, size: 0.06 },                // exhaust
+    fairy:     { color: 0xffffff, dir: 0, spread: 0.6, speed: 0.08, life: 2.2, size: 0.045, wobble: true }, // pixie dust
+    blueberry: { color: 0x9aa6ff, dir: 0, spread: 0.5, speed: 0.1, life: 1.8, size: 0.05, wobble: true },   // juice motes
+    tungsahur: { color: 0xc89058, dir: 0, spread: 0.5, speed: 0.35, life: 1.0, size: 0.05 },                // wood chips
+    vacasaturno:{ color: 0xffffff, dir: 0, spread: 0.65, speed: 0.05, life: 2.6, size: 0.045, wobble: true },// orbit stars
+    brainrot:  { color: 0xff5a80, dir: 0, spread: 0.6, speed: 0.4, life: 1.0, size: 0.05, wobble: true }    // rotting thoughts
   };
 
   function respawnAmbient(i, cfg, center) {
@@ -4282,6 +4959,26 @@
       o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t + 0.85);
     });
   }
+  // tung, tung, tung — three hollow wooden knocks for the Sahur banana
+  function playKnock() {
+    var ctx = ensureAudio(); if (!ctx) return;
+    var t = ctx.currentTime;
+    [0, 0.22, 0.44].forEach(function (dt) {
+      var tt = t + dt;
+      var o = ctx.createOscillator(); o.type = "sine";
+      o.frequency.setValueAtTime(190, tt);
+      o.frequency.exponentialRampToValueAtTime(95, tt + 0.09);
+      var g = ctx.createGain();
+      g.gain.setValueAtTime(0.45, tt);
+      g.gain.exponentialRampToValueAtTime(0.001, tt + 0.14);
+      o.connect(g); g.connect(ctx.destination); o.start(tt); o.stop(tt + 0.16);
+      var src = ctx.createBufferSource(); src.buffer = getNoise(ctx);
+      var f = ctx.createBiquadFilter(); f.type = "bandpass"; f.frequency.value = 900;
+      var g2 = ctx.createGain(); g2.gain.setValueAtTime(0.12, tt);
+      g2.gain.exponentialRampToValueAtTime(0.001, tt + 0.05);
+      src.connect(f); f.connect(g2); g2.connect(ctx.destination); src.start(tt); src.stop(tt + 0.06);
+    });
+  }
   function buzz(pattern) {
     try { if (navigator.vibrate) navigator.vibrate(pattern); } catch (e) {}
   }
@@ -4743,6 +5440,7 @@
         else if (r.revealSound === "womp") playWomp();
         else if (r.revealSound === "thud") playThud();
         else if (r.revealSound === "cheer") playCheer();
+        else if (r.revealSound === "knock") playKnock();
         else playSparkle();
         buzz([25, 40, 55]);
         // the breathing glow behind the fruit takes on the tier's color
@@ -5582,6 +6280,7 @@
   }
 
   requestAnimationFrame(frame);
+
 })();
 </script>
 </body>
