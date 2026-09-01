@@ -317,6 +317,35 @@
     border-radius: 4px; transform-origin: left center; z-index: 6;
     display: none; pointer-events: none;
   }
+  /* ---- tier-classified stage backdrops ---- */
+  #stage-wrap { transition: background 0.9s ease; --tier-rgb: 255,213,80; }
+  /* legendary: the whole stage bathes in the tier's color and slowly pulses */
+  #stage-wrap.tier-high {
+    background:
+      radial-gradient(ellipse 90% 60% at 50% 40%, rgba(var(--tier-rgb), 0.30), rgba(var(--tier-rgb), 0.08) 50%, transparent 78%);
+    animation: tierPulse 3.2s ease-in-out infinite;
+  }
+  @keyframes tierPulse { 50% { filter: brightness(1.3) saturate(1.2); } }
+  /* epic: a stronger, tighter halo than the default glow */
+  #stage-wrap.tier-med {
+    background: radial-gradient(ellipse 70% 45% at 50% 45%, rgba(var(--glow-rgb), 0.16), transparent 65%);
+  }
+  #stage-wrap.tier-med::before { animation-duration: 2.6s; }
+  /* the secret tier: the stage falls into the void */
+  #stage-wrap.tier-secret {
+    background:
+      radial-gradient(ellipse 80% 55% at 50% 42%, rgba(138,43,255,0.28), rgba(5,5,12,0.92) 72%), #05050c;
+    animation: tierPulse 2.2s ease-in-out infinite;
+  }
+  /* collection book category sections */
+  .col-cat {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 14px 4px 5px; font-weight: 700; font-size: 0.85rem;
+    letter-spacing: 0.04em; border-bottom: 1px solid rgba(255,255,255,0.14);
+  }
+  .col-cat .cat-count { font-weight: 400; font-size: 0.75rem; opacity: 0.7; }
+  .col-cat.cat-done { color: #ffd94b; }
+  .col-cat.cat-secret { color: #b45cff; }
 </style>
 </head>
 <body>
@@ -342,7 +371,7 @@
     <div id="flash"></div>
     <div id="progress-bar"><div id="progress-fill"></div></div>
   </div>
-  <footer>Peel fast to chain combos · collect all 215 rare bananas</footer>
+  <footer>Peel fast to chain combos · collect all 215 rare bananas · something else is hiding…</footer>
   <div id="collection">
     <div class="col-card">
       <h2>📖 Collection <span id="col-progress"></span></h2>
@@ -2969,6 +2998,16 @@
     x.fillStyle = "#40e0ff"; x.font = "bold 17px monospace"; x.fillText("¯\\_(ツ)_/¯", 66, 132); // the rot
     return canvasTex(c);
   }
+  // the secret tier: a void-black fruit with a violet slit that watches you
+  function buildForbiddenTexture() {
+    var c = makeCanvas(256), x = c.getContext("2d");
+    x.fillStyle = "#05050c"; x.fillRect(0, 0, 256, 256);
+    for (var n = 0; n < 46; n++) { x.fillStyle = "rgba(150,80,255," + (Math.random() * 0.5 + 0.12) + ")"; x.beginPath(); x.arc(Math.random() * 256, Math.random() * 256, Math.random() * 1.8 + 0.4, 0, 6.2832); x.fill(); } // dead stars
+    var g = x.createRadialGradient(128, 128, 4, 128, 128, 62); g.addColorStop(0, "rgba(160,60,255,0.8)"); g.addColorStop(1, "rgba(160,60,255,0)");
+    x.fillStyle = g; x.beginPath(); x.ellipse(128, 128, 62, 26, 0, 0, 6.2832); x.fill();
+    x.fillStyle = "#05050c"; x.beginPath(); x.ellipse(128, 128, 9, 23, 0, 0, 6.2832); x.fill(); // the watching slit
+    return canvasTex(c);
+  }
 
   // a peel-tinted panel stamped with a big number, for the puzzle banana's
   // "peel in order" challenge (drawn on the strips themselves)
@@ -3087,7 +3126,8 @@
     ballerina: buildBallerinaTexture(), assassino: buildAssassinoTexture(), patapim: buildPatapimTexture(),
     lirili: buildLiriliTexture(), chimpanzini: buildChimpanziniTexture(), bombombini: buildBombombiniTexture(),
     trippitroppi: buildTrippiTexture(), vacasaturno: buildVacaSaturnoTexture(), frigocamelo: buildFrigoCameloTexture(),
-    skibidi: buildSkibidiTexture(), sigma: buildSigmaTexture(), brainrot: buildBrainrotTexture()
+    skibidi: buildSkibidiTexture(), sigma: buildSigmaTexture(), brainrot: buildBrainrotTexture(),
+    forbidden: buildForbiddenTexture()
   };
 
   // ---- rarity tiers: each banana rolls one; the inner fruit takes the material.
@@ -3464,6 +3504,11 @@
     { name: "brainrot", mult: 20, weight: 0.38, label: "🧠 Brainrot Banana", hueShift: true, gooey: true, infectNext: true, dangerMsg: true,
       core: { physical: true, color: 0xffffff, mapKind: "brainrot", metalness: 0.0, roughness: 0.25,
         clearcoat: 0.8, clearcoatRoughness: 0.15, emissive: 0xff5a80, emissiveIntensity: 0.3, envMapIntensity: 1.0 } },
+    // the SECRET tier: never rolled by luck — summoned only by peeling three
+    // bananas in a row, each under five seconds (the ritual)
+    { name: "forbidden", mult: 100, weight: 0, secret: true, label: "🕳️ The Forbidden Banana", pulse: true, fastPulse: true, sparkle: true,
+      core: { physical: true, color: 0x14141f, mapKind: "forbidden", metalness: 0.6, roughness: 0.15,
+        clearcoat: 1.0, clearcoatRoughness: 0.05, emissive: 0x8a2bff, emissiveIntensity: 0.55, envMapIntensity: 1.8 } },
     { name: "cosmicwhale", mult: 22, weight: 0.35, label: "🐋 Cosmic Whale Banana", floaty: true, pulse: true, revealSound: "whale",
       core: { color: 0xffffff, mapKind: "cosmicwhale", glowMap: true, metalness: 0.1, roughness: 0.4,
         emissive: 0x6a8cff, emissiveIntensity: 0.5, envMapIntensity: 0.7 } },
@@ -3774,6 +3819,57 @@
   var normalStreak = 0;
   var TOTAL_WEIGHT = RARITIES.reduce(function (sum, r) { return sum + r.weight; }, 0);
   RARITIES.forEach(function (r) { r.chance = RARE_TOTAL * r.weight / TOTAL_WEIGHT; });
+  // tier classification: commons stay plain, epics get beefed-up effects,
+  // legendaries retint the whole stage, and the secret tier is its own event
+  function tierClassOf(r) {
+    if (!r) return "low";
+    if (r.secret) return "secret";
+    return r.mult >= 14 ? "high" : r.mult >= 9 ? "med" : "low";
+  }
+  var FORBIDDEN = null;
+  RARITIES.forEach(function (r) { if (r.secret) FORBIDDEN = r; });
+  var fastStreak = 0; // consecutive sub-5s peels — three in a row summon the secret
+
+  // ---- thematic categories: how the collection book groups the roster ----
+  var CATEGORIES = [
+    { key: "food", label: "🍔 Food & Drink" },
+    { key: "creature", label: "🐾 Creatures" },
+    { key: "mythic", label: "✨ Mythic & Magic" },
+    { key: "cosmic", label: "🌌 Cosmic" },
+    { key: "nature", label: "🌿 Elements & Nature" },
+    { key: "spooky", label: "👻 Spooky" },
+    { key: "luxury", label: "💎 Luxury" },
+    { key: "arts", label: "🎨 Arts & Music" },
+    { key: "tech", label: "🕹️ Tech & Retro" },
+    { key: "games", label: "🎲 Games & Toys" },
+    { key: "adventure", label: "⚔️ Adventure" },
+    { key: "trendy", label: "🔥 Trendy" },
+    { key: "brainrot", label: "🤪 Brainrot" },
+    { key: "weird", label: "🌀 Weird & Wonderful" },
+    { key: "secret", label: "🕳️ ???" }
+  ];
+  var CATEGORY_MEMBERS = {
+    food: ["chocolate", "candy", "honey", "cheese", "watermelon", "berry", "pizza", "icecream", "sushi", "soda", "bubblegum", "donut", "burger", "chili", "mushroom", "taco", "dumpling", "matcha", "boba", "juicebox", "strawmilk", "avocado", "toast", "waffle", "croissant", "ramen", "lollipop", "peach", "mango", "kiwi", "blueberry", "pickle", "melting", "rotten"],
+    creature: ["bee", "zebra", "dino", "kraken", "butterfly", "owl", "lion", "dragonfly", "shark", "frog", "cat", "snake", "turtle", "pufferfish", "sloth", "panda", "flamingo", "peacock", "firefly", "chameleon"],
+    mythic: ["unicorn", "dragon", "phoenix", "mermaid", "fairy", "genie", "angel", "imp", "wizard", "mystic", "runic", "amulet", "dream", "chrono", "8ball"],
+    cosmic: ["galaxy", "saturn", "blackhole", "comet", "aurora", "cosmicwhale", "eclipse", "ufo", "rocket", "alien"],
+    nature: ["lava", "frozen", "toxic", "electric", "storm", "tornado", "blizzard", "tsunami", "icecube", "thermal", "cloud", "frostbite", "sunflower", "sakura", "lotus", "cactus", "bamboo", "coral", "flytrap", "rainbow", "wooden", "fossil"],
+    spooky: ["ghost", "zombie", "vampire", "spooky", "cursed", "pumpkin", "skeleton", "mummy", "gargoyle", "werewolf", "eyeball", "candle"],
+    luxury: ["golden", "diamond", "silver", "bronze", "crystal", "royal", "trophy", "mirror", "bling", "money", "obsidian", "marble", "prism"],
+    arts: ["musical", "rockstar", "theater", "vangogh", "graffiti", "stainedglass", "origami", "harp", "drum", "carousel", "disco", "lofi", "ringmaster", "wetpaint", "lantern", "bell"],
+    tech: ["pixel", "arcade", "cyber", "glitch", "battery", "magnet", "clockwork", "dna", "vhs", "floppy", "gamer", "matrix", "mecha", "nuke"],
+    games: ["dice", "puzzle", "chess", "jackpot", "joker", "pinata", "balloon", "birthday", "festive", "firework", "piggy", "teddy", "yoyo", "duck", "matryoshka", "boxing", "bowling", "snowglobe", "soapbubble", "bubblewrap", "tickle"],
+    adventure: ["pirate", "treasuremap", "compass", "ninja", "samurai", "viking", "camo", "trap", "poisondart", "tnt"],
+    trendy: ["y2k", "vaporwave", "cottagecore", "goth", "barbie", "kawaii", "pride", "denim", "skater", "doomscroll"],
+    brainrot: ["tungsahur", "tralalero", "bombardiro", "ballerina", "assassino", "patapim", "lirili", "chimpanzini", "bombombini", "trippitroppi", "vacasaturno", "frigocamelo", "skibidi", "sigma", "brainrot"],
+    weird: ["slime", "hypno", "virus"],
+    secret: ["forbidden"]
+  };
+  var CATEGORY_OF = {};
+  Object.keys(CATEGORY_MEMBERS).forEach(function (k) {
+    CATEGORY_MEMBERS[k].forEach(function (n) { CATEGORY_OF[n] = k; });
+  });
+  function categoryOf(r) { return CATEGORY_OF[r.name] || "weird"; }
   // debris color for each tier's completion burst (default gold for normals)
   var BURST_COLORS = {
     diamond: 0xbfe8ff, golden: 0xffd23f, galaxy: 0x9a6cff, rainbow: 0xff66cc,
@@ -3832,7 +3928,7 @@
     ballerina: 0xffc8d8, assassino: 0xc8a070, patapim: 0x6a8a3a,
     lirili: 0xd8b070, chimpanzini: 0xffd94b, bombombini: 0xff8c20,
     trippitroppi: 0xff6890, vacasaturno: 0xe0c284, frigocamelo: 0x8ad0e8,
-    skibidi: 0x5ab0d8, sigma: 0x6a6a72, brainrot: 0xff5a80
+    skibidi: 0x5ab0d8, sigma: 0x6a6a72, brainrot: 0xff5a80, forbidden: 0x8a2bff
   };
   RARITIES.forEach(function (r) { r.burstColor = BURST_COLORS[r.name]; });
   var cheatQueue = null; // null = off; otherwise the still-locked tiers left to hand out
@@ -3845,9 +3941,19 @@
       if (cheatQueue.length) return cheatQueue.shift();
       cheatQueue = null;
     }
+    // the ritual: three consecutive sub-5s peels summon the Forbidden Banana
+    // (guaranteed the first time; a 1-in-5 echo once it's already collected)
+    if (fastStreak >= 3 && FORBIDDEN) {
+      var ownedF = collection || {};
+      if (!ownedF[FORBIDDEN.name] || Math.random() < 0.2) {
+        fastStreak = 0;
+        return FORBIDDEN;
+      }
+      fastStreak = 0;
+    }
     if (forceNextRare) {
       forceNextRare = false;
-      var pool = RARITIES.filter(function (r) { return r.name !== "virus"; });
+      var pool = RARITIES.filter(function (r) { return r.name !== "virus" && !r.secret; });
       return pool[Math.random() * pool.length | 0];
     }
     // every 100th banana is a guaranteed Trophy — a milestone reward
@@ -5422,7 +5528,7 @@
         if (r.dangerMsg) revealMsg += " ☠️ Careful!";
         if (r.hint) {
           // compass: points toward one tier you haven't found yet
-          var undiscovered = RARITIES.filter(function (r2) { return r2.name !== "compass" && !collection[r2.name]; });
+          var undiscovered = RARITIES.filter(function (r2) { return r2.name !== "compass" && !r2.secret && !collection[r2.name]; });
           if (undiscovered.length) {
             var target = undiscovered[Math.random() * undiscovered.length | 0];
             revealMsg = "🧭 The needle points toward... " + target.label + "!";
@@ -5445,6 +5551,19 @@
         buzz([25, 40, 55]);
         // the breathing glow behind the fruit takes on the tier's color
         if (r.burstColor) stageWrap.style.setProperty("--glow-rgb", hexToRgbStr(r.burstColor));
+        // prestige presentation: legendaries retint the whole stage,
+        // epics get their reveal effects turned up a notch
+        var tclass = tierClassOf(r);
+        stageWrap.classList.remove("tier-high", "tier-med");
+        if (tclass === "high" || tclass === "secret") {
+          stageWrap.classList.add("tier-high");
+          if (r.burstColor) stageWrap.style.setProperty("--tier-rgb", hexToRgbStr(r.burstColor));
+        } else if (tclass === "med") {
+          stageWrap.classList.add("tier-med");
+          current.coreMat.emissiveIntensity = Math.min(1.6, (current.coreMat.emissiveIntensity || 0.1) * 1.4 + 0.08);
+          current.coreMat.envMapIntensity = (current.coreMat.envMapIntensity || 1) * 1.15;
+          kickWobble(0.8);
+        }
       } else {
         showToast(REVEAL_MSGS[Math.random() * REVEAL_MSGS.length | 0]);
       }
@@ -5484,6 +5603,13 @@
       bananaElapsed = (performance.now() - bananaStart) / 1000;
       updateCount();
       bump(countEl);
+
+      // the ritual: three consecutive sub-5s peels summon the secret tier
+      fastStreak = (started && bananaElapsed < 5) ? fastStreak + 1 : 0;
+      if (fastStreak === 3 && FORBIDDEN && !collection[FORBIDDEN.name]) {
+        showToast("⚡ The air grows heavy…");
+        buzz([30, 30, 30, 30, 60]);
+      }
 
       // completion bonus scaled by rarity, plus a speed bonus for quick peels
       var isTNT = current.rarity && current.rarity.name === "tnt";
@@ -5599,6 +5725,11 @@
         if (rr.meltFrost && started && bananaElapsed < 7) { bonus += 180; bonusTag += " ⛄ Thawed fast!"; }
         if (rr.smear && fxc.smearCount > 30) { bonus += Math.min(250, fxc.smearCount * 4); bonusTag += " 🎨 Masterpiece!"; }
       }
+      if (rr && rr.secret) {
+        // the Forbidden Banana: a mythic payout and a proper celebration
+        bonusTag += " 🕳️ MYTHIC!";
+        playCheer();
+      }
       // phoenix: its own completion doesn't end the streak — the combo carries
       // into whatever spawns next instead of expiring on the usual timer
       if (rr && rr.comboCarry) comboGraceUntil = performance.now() + 10000;
@@ -5619,7 +5750,7 @@
       }
       // joker: peeling it also unlocks one other random locked tier, free
       if (rr && rr.wildcard) {
-        var stillLocked = RARITIES.filter(function (r2) { return r2.name !== "joker" && !collection[r2.name]; });
+        var stillLocked = RARITIES.filter(function (r2) { return r2.name !== "joker" && !r2.secret && !collection[r2.name]; });
         if (stillLocked.length) {
           var freebie = stillLocked[Math.random() * stillLocked.length | 0];
           collection[freebie.name] = (collection[freebie.name] || 0) + 1;
@@ -5641,7 +5772,8 @@
       pMat.color.setHex(burstCol);
       var burstCenter = current.group.localToWorld(new THREE.Vector3(0, 0, 0));
       var isNuke = rr && rr.nuke;
-      var isBig = isTNT || isNuke || rname === "golden" || rname === "diamond" || rname === "royal" || rname === "trophy" || (rr && rr.bigBurst);
+      var isBig = isTNT || isNuke || rname === "golden" || rname === "diamond" || rname === "royal" || rname === "trophy" || (rr && rr.bigBurst)
+        || (rr && rr.mult >= 9); // epics and above always go out with a big burst
       burst(burstCenter, isBig);
       if (isTNT || isNuke) {
         playBoom();
@@ -5709,6 +5841,13 @@
     progressFill.style.width = "0%";
     for (var i = 0; i < AMB_COUNT; i++) ambLife[i] = 0; // force-respawn for the new tier's effect
     stageWrap.style.removeProperty("--glow-rgb");      // back to the default warm glow
+    stageWrap.classList.remove("tier-high", "tier-med", "tier-secret");
+    // the Forbidden Banana announces itself the moment it appears
+    if (current.rarity && current.rarity.secret) {
+      stageWrap.classList.add("tier-secret");
+      showToast("🕳️ Something is very wrong with this one…");
+      playRumble(); buzz([60, 40, 80]);
+    }
     wobbleAmp = 0;
   }
 
@@ -5731,23 +5870,37 @@
 
   // ---- collection book ----
   function renderCollection() {
-    var found = 0;
+    var found = 0, total = 0;
     colListEl.innerHTML = "";
-    RARITIES.forEach(function (r) {
-      var n = collection[r.name] || 0;
-      if (n) found++;
-      var row = document.createElement("div");
-      row.className = "col-row" + (n ? "" : " locked");
-      var name = document.createElement("span");
-      name.textContent = n ? r.label : "❓ ???";
-      var count = document.createElement("span");
-      count.className = "col-count";
-      count.textContent = n ? "×" + n : "not found";
-      row.appendChild(name); row.appendChild(count);
-      colListEl.appendChild(row);
+    CATEGORIES.forEach(function (cat) {
+      var members = RARITIES.filter(function (r) { return categoryOf(r) === cat.key; });
+      if (!members.length) return;
+      var catFound = members.filter(function (r) { return collection[r.name]; }).length;
+      // the secret category stays completely invisible until it's been earned
+      if (cat.key === "secret" && !catFound) return;
+      found += catFound;
+      total += members.length;
+      var head = document.createElement("div");
+      head.className = "col-cat" + (catFound === members.length ? " cat-done" : "") + (cat.key === "secret" ? " cat-secret" : "");
+      var hl = document.createElement("span"); hl.textContent = cat.label;
+      var hc = document.createElement("span"); hc.className = "cat-count"; hc.textContent = catFound + "/" + members.length;
+      head.appendChild(hl); head.appendChild(hc);
+      colListEl.appendChild(head);
+      members.forEach(function (r) {
+        var n = collection[r.name] || 0;
+        var row = document.createElement("div");
+        row.className = "col-row" + (n ? "" : " locked");
+        var name = document.createElement("span");
+        name.textContent = n ? r.label : "❓ ???";
+        var count = document.createElement("span");
+        count.className = "col-count";
+        count.textContent = n ? "×" + n : "not found";
+        row.appendChild(name); row.appendChild(count);
+        colListEl.appendChild(row);
+      });
     });
-    colProgressEl.textContent = found + "/" + RARITIES.length;
-    collectBtn.textContent = "📖 " + found + "/" + RARITIES.length;
+    colProgressEl.textContent = found + "/" + total;
+    collectBtn.textContent = "📖 " + found + "/" + total;
   }
   // secret cheat: tap the banana logo 7 times while the current banana is
   // still untouched, and every STILL-LOCKED rare tier spawns one by one
@@ -5763,7 +5916,7 @@
     cheatClicks++;
     if (cheatClicks >= 7) {
       cheatClicks = 0;
-      var locked = RARITIES.filter(function (r) { return !collection[r.name]; });
+      var locked = RARITIES.filter(function (r) { return !collection[r.name] && !r.secret; });
       if (!locked.length) {
         showToast("📖 Every rare already collected! ✨");
         playSparkle();
